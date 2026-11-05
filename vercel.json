@@ -4,7 +4,10 @@
   "outputDirectory": ".",
   "functions": {
     "api/page.js": {
-      "includeFiles": "categories/**/*.html"
+      "includeFiles": ["sites/**/*.html", "categories/**/*.html"]
+    },
+    "api/pages.js": {
+      "includeFiles": ["sites/**/*.html", "categories/**/*.html"]
     }
   },
   "rewrites": [
