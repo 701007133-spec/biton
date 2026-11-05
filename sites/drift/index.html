@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Drift — Short vertical video, that keeps going</title>
+<meta name="description" content="Drift is a TikTok-style vertical video feed. Six real AI-generated clips from Still Standing, Part 2 — swipe up, tap to play or pause, tap the heart to like." />
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:#000;color:#fff;font-family:Inter,system-ui,sans-serif;overflow:hidden}
+header{position:fixed;top:0;left:0;right:0;z-index:10;display:flex;justify-content:space-between;align-items:center;padding:14px 18px;background:linear-gradient(180deg,rgba(0,0,0,.7),transparent);pointer-events:none}
+header b{font-size:22px;letter-spacing:-.02em}
+header span{font-size:12px;color:#ddd}
+.feed{height:100dvh;overflow-y:auto;scroll-snap-type:y mandatory;scrollbar-width:none}
+.feed::-webkit-scrollbar{display:none}
+.clip{position:relative;height:100dvh;scroll-snap-align:start;scroll-snap-stop:always;display:flex;align-items:flex-end;justify-content:center;background:#111}
+.clip video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.info{position:relative;z-index:2;width:100%;max-width:520px;padding:0 18px 28px}
+.info h2{margin:0 0 4px;font-size:19px}
+.info p{margin:0 0 12px;color:#e5e5e5;font-size:14px}
+.meta{display:flex;gap:10px;align-items:center}
+.handle{font-weight:700;font-size:14px}
+.tag{font-size:12px;color:#ccc}
+.actions{position:absolute;right:14px;bottom:110px;z-index:3;display:flex;flex-direction:column;gap:18px;align-items:center}
+.actions button{background:rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.35);color:#fff;border-radius:999px;width:52px;height:52px;font-size:22px;cursor:pointer}
+.actions button.liked{background:#FE2C55;border-color:#FE2C55}
+.actions span{font-size:12px;margin-top:-12px}
+.progress{position:absolute;left:0;right:0;bottom:0;height:3px;background:rgba(255,255,255,.25);z-index:3}
+.progress i{display:block;height:100%;width:0;background:#FE2C55}
+.hint{position:fixed;bottom:14px;left:50%;transform:translateX(-50%);z-index:10;font-size:12px;color:#ddd;background:rgba(0,0,0,.5);padding:6px 12px;border-radius:999px}
+footer{position:fixed;left:0;right:0;bottom:0;height:0}
+</style>
+</head>
+<body>
+<header><b>Drift</b><span>AI-generated clips · Still Standing, Part 2</span></header>
+<main class="feed" id="feed"></main>
+<div class="hint">Scroll to swipe · Tap video to play / pause</div>
+<script>
+var clips = [
+  {src:"assets/clip1.mp4", handle:"@stillstanding", title:"The call", text:"One phone call. Everything changes after this."},
+  {src:"assets/clip2.mp4", handle:"@stillstanding", title:"The pitch", text:"A cafe, a pitch, and a room full of doubt."},
+  {src:"assets/clip3.mp4", handle:"@stillstanding", title:"First yes", text:"The first yes is the loudest one."},
+  {src:"assets/clip4.mp4", handle:"@stillstanding", title:"Night grind", text:"Nobody sees the night grind."},
+  {src:"assets/clip5.mp4", handle:"@stillstanding", title:"The crowd", text:"Then the crowd shows up."},
+  {src:"assets/clip6.mp4", handle:"@stillstanding", title:"Still standing", text:"Keep going. That's the whole story."}
+];
+var liked = JSON.parse(localStorage.getItem("drift-likes") || "{}");
+var feed = document.getElementById("feed");
+clips.forEach(function(c, i){
+  var el = document.createElement("section");
+  el.className = "clip";
+  el.innerHTML = '<video src="' + c.src + '" loop muted playsinline preload="metadata"></video>' +
+    '<div class="actions"><button type="button" aria-label="Like" data-i="' + i + '">' + (liked[i] ? "♥" : "♡") + '</button><span>' + (liked[i] ? "Liked by you" : "Like") + '</span></div>' +
+    '<div class="info"><div class="meta"><span class="handle">' + c.handle + '</span><span class="tag">Clip ' + (i+1) + ' of 6 · 10s · AI-generated</span></div><h2>' + c.title + '</h2><p>' + c.text + '</p></div>' +
+    '<div class="progress"><i></i></div>';
+  feed.appendChild(el);
+});
+var videos = Array.prototype.slice.call(document.querySelectorAll("video"));
+videos.forEach(function(v){
+  v.addEventListener("click", function(){ if (v.paused) v.play(); else v.pause(); });
+  v.addEventListener("timeupdate", function(){
+    var bar = v.parentElement.querySelector(".progress i");
+    if (v.duration) bar.style.width = (v.currentTime / v.duration * 100) + "%";
+  });
+});
+document.querySelectorAll(".actions button").forEach(function(b){
+  b.addEventListener("click", function(){
+    var i = b.getAttribute("data-i");
+    liked[i] = !liked[i];
+    localStorage.setItem("drift-likes", JSON.stringify(liked));
+    b.textContent = liked[i] ? "♥" : "♡";
+    b.classList.toggle("liked", !!liked[i]);
+    b.nextElementSibling.textContent = liked[i] ? "Liked by you" : "Like";
+  });
+});
+var observer = new IntersectionObserver(function(entries){
+  entries.forEach(function(e){
+    var v = e.target.querySelector("video");
+    if (!v) return;
+    if (e.intersectionRatio > 0.6) { v.play().catch(function(){}); }
+    else { v.pause(); }
+  });
+}, {threshold:[0, 0.6, 1]});
+document.querySelectorAll(".clip").forEach(function(c){ observer.observe(c); });
+</script>
+</body>
+</html>
