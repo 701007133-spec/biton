@@ -1,0 +1,640 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="color-scheme" content="light dark" />
+<link rel="icon" href="data:," />
+<title>Northbound — Rail Journeys, Slowed Down</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Archivo:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --bg:#F6F1E7; --bg-2:#EFE7D7; --surface:#FFFDF8; --ink:#16211B; --ink-2:#43514A;
+    --line:#D9CFBB; --pine:#274435; --pine-2:#1B2F24; --signal:#C2491D; --signal-ink:#A83C15;
+    --gold:#B98A2F; --on-pine:#F3ECDB; --on-pine-2:#C9D2C4;
+    --radius:14px; --max:1180px;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#0D130F; --bg-2:#111A14; --surface:#16211A; --ink:#EFE8D5; --ink-2:#A9B4A4;
+      --line:#2A3A2F; --pine:#1E3328; --pine-2:#14231B; --signal:#E0683C; --signal-ink:#EE8256;
+      --gold:#D3A24A; --on-pine:#F3ECDB; --on-pine-2:#C9D2C4;
+    }
+  }
+  html{ scroll-behavior:smooth; }
+  body{ margin:0; background:var(--bg); color:var(--ink); font-family:"Archivo",system-ui,sans-serif; font-size:16px; line-height:1.55; -webkit-font-smoothing:antialiased; }
+  h1,h2,h3,p,ul,ol,figure,blockquote{ margin:0; }
+  ul,ol{ padding:0; list-style:none; }
+  img{ display:block; max-width:100%; }
+  a{ color:inherit; }
+  button{ font:inherit; cursor:pointer; }
+  .wrap{ max-width:var(--max); margin:0 auto; padding:0 24px; }
+  .serif{ font-family:"Newsreader",Georgia,serif; }
+  .mono{ font-family:"IBM Plex Mono",ui-monospace,monospace; }
+
+  /* ---------- header ---------- */
+  header.site{ position:sticky; top:0; z-index:40; background:color-mix(in srgb, var(--bg) 88%, transparent); backdrop-filter:blur(10px); border-bottom:1px solid var(--line); }
+  .nav{ display:flex; align-items:center; gap:28px; height:64px; }
+  .wordmark{ display:flex; align-items:center; gap:10px; text-decoration:none; font-weight:800; letter-spacing:.14em; font-size:15px; }
+  .wordmark .dia{ width:11px; height:11px; background:var(--signal); transform:rotate(45deg); flex:none; }
+  .nav nav{ display:flex; gap:22px; margin-left:12px; }
+  .nav nav a{ text-decoration:none; font-size:14px; font-weight:500; color:var(--ink-2); }
+  .nav nav a:hover{ color:var(--ink); }
+  .nav .spacer{ flex:1; }
+  .btn{ display:inline-flex; align-items:center; gap:8px; border:1px solid var(--ink); background:var(--ink); color:var(--bg); padding:10px 18px; border-radius:999px; font-weight:600; font-size:14px; text-decoration:none; transition:transform .15s ease, background .15s ease; }
+  .btn:hover{ transform:translateY(-1px); }
+  .btn.signal{ background:var(--signal); border-color:var(--signal); color:#FFF6E8; }
+  .btn.ghost{ background:transparent; color:var(--ink); }
+  .btn.small{ padding:8px 14px; font-size:13px; }
+  @media (max-width:760px){ .nav nav{ display:none; } }
+
+  /* ---------- hero ---------- */
+  .hero{ position:relative; }
+  .hero figure{ height:min(78vh,640px); min-height:440px; overflow:hidden; }
+  .hero figure img{ width:100%; height:100%; object-fit:cover; }
+  .hero .veil{ position:absolute; inset:0; background:linear-gradient(to top, rgba(10,16,12,.74) 0%, rgba(10,16,12,.34) 52%, rgba(10,16,12,.14) 100%); }
+  .hero-copy h1, .hero-copy p.lede{ text-shadow:0 1px 14px rgba(8,12,9,.5); }
+  .hero-copy{ position:absolute; left:0; right:0; bottom:0; color:#F6F1E7; padding-bottom:34px; }
+  .hero-copy .route-tag{ display:inline-block; font-family:"IBM Plex Mono",monospace; font-size:12px; letter-spacing:.12em; text-transform:uppercase; border:1px solid rgba(246,241,231,.55); padding:6px 12px; border-radius:999px; margin-bottom:18px; }
+  .hero h1{ font-family:"Newsreader",Georgia,serif; font-weight:500; font-size:clamp(40px,6.4vw,76px); line-height:1.02; letter-spacing:-.01em; max-width:13ch; }
+  .hero h1 em{ font-style:italic; color:#F0B429; }
+  .hero p.lede{ margin-top:16px; max-width:52ch; font-size:17px; color:#E7DFCB; }
+  /* planner */
+  .planner{ margin-top:26px; background:var(--surface); color:var(--ink); border-radius:var(--radius); padding:14px; display:grid; grid-template-columns:1fr 1fr 1fr auto; gap:10px; box-shadow:0 18px 40px rgba(8,12,9,.35); max-width:880px; }
+  .planner label{ display:block; font-size:11px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-2); margin:2px 0 4px 4px; }
+  .planner select{ width:100%; font:inherit; font-size:15px; font-weight:500; color:var(--ink); background:var(--bg); border:1px solid var(--line); border-radius:9px; padding:10px; appearance:none; }
+  .planner .go{ align-self:end; }
+  .planner .note{ grid-column:1/-1; font-size:13px; color:var(--signal-ink); font-weight:600; min-height:0; }
+  .planner .note:empty{ display:none; }
+  @media (max-width:760px){ .planner{ grid-template-columns:1fr 1fr; } .planner .go{ grid-column:1/-1; justify-content:center; } .planner select{ font-size:13.5px; padding:10px 8px; } }
+
+  /* ---------- stat strip ---------- */
+  .stats{ border-bottom:1px solid var(--line); }
+  .stats .wrap{ display:grid; grid-template-columns:repeat(4,1fr); }
+  .stat{ padding:26px 18px 24px; border-left:1px solid var(--line); }
+  .stat:first-child{ border-left:none; padding-left:0; }
+  .stat b{ display:block; font-family:"Newsreader",serif; font-weight:600; font-size:34px; line-height:1; }
+  .stat span{ font-size:13px; color:var(--ink-2); }
+  @media (max-width:760px){ .stats .wrap{ grid-template-columns:1fr 1fr; } .stat{ padding-left:14px; } .stat:nth-child(odd){ border-left:none; padding-left:0; } }
+
+  /* ---------- sections ---------- */
+  section.block{ padding:84px 0; }
+  section.block.tight{ padding:56px 0; }
+  .sec-head{ display:flex; align-items:end; justify-content:space-between; gap:24px; margin-bottom:34px; flex-wrap:wrap; }
+  .sec-head h2{ font-family:"Newsreader",serif; font-weight:500; font-size:clamp(30px,4vw,44px); line-height:1.08; letter-spacing:-.01em; max-width:20ch; }
+  .sec-head p{ color:var(--ink-2); max-width:46ch; margin-top:10px; }
+
+  /* ---------- journey cards ---------- */
+  .chips{ display:flex; gap:8px; flex-wrap:wrap; }
+  .chip{ border:1px solid var(--line); background:var(--surface); color:var(--ink-2); border-radius:999px; padding:8px 16px; font-size:13.5px; font-weight:600; }
+  .chip[aria-pressed="true"]{ background:var(--pine); border-color:var(--pine); color:var(--on-pine); }
+  .featured{ display:grid; grid-template-columns:1.25fr 1fr; border:1px solid var(--line); border-radius:18px; overflow:hidden; background:var(--surface); margin-bottom:22px; }
+  .featured figure{ min-height:320px; }
+  .featured figure img{ width:100%; height:100%; object-fit:cover; }
+  .featured .body{ padding:34px; display:flex; flex-direction:column; gap:12px; }
+  .tagrow{ display:flex; gap:8px; flex-wrap:wrap; }
+  .tag{ font-family:"IBM Plex Mono",monospace; font-size:11px; letter-spacing:.08em; text-transform:uppercase; border:1px solid var(--line); padding:4px 10px; border-radius:999px; color:var(--ink-2); }
+  .tag.hot{ background:var(--signal); border-color:var(--signal); color:#FFF3E4; }
+  .featured h3, .jcard h3{ font-family:"Newsreader",serif; font-weight:600; font-size:27px; line-height:1.12; }
+  .featured p, .jcard p{ color:var(--ink-2); font-size:15px; }
+  .meta{ display:flex; gap:18px; flex-wrap:wrap; font-family:"IBM Plex Mono",monospace; font-size:12.5px; color:var(--ink-2); margin-top:auto; padding-top:8px; }
+  .meta b{ color:var(--ink); font-weight:500; }
+  .price{ font-size:15px; } .price b{ font-size:19px; }
+  .grid3{ display:grid; grid-template-columns:repeat(3,1fr); gap:22px; }
+  .jcard{ border:1px solid var(--line); border-radius:18px; overflow:hidden; background:var(--surface); display:flex; flex-direction:column; transition:transform .18s ease, box-shadow .18s ease; }
+  .jcard:hover{ transform:translateY(-3px); box-shadow:0 16px 34px rgba(10,16,12,.14); }
+  .jcard figure{ aspect-ratio:16/10; overflow:hidden; }
+  .jcard figure img{ width:100%; height:100%; object-fit:cover; transition:transform .4s ease; }
+  .jcard:hover figure img{ transform:scale(1.04); }
+  .jcard .body{ padding:22px; display:flex; flex-direction:column; gap:10px; flex:1; }
+  .jcard .foot{ display:flex; align-items:center; justify-content:space-between; border-top:1px solid var(--line); padding:14px 22px; }
+  .link-arrow{ font-weight:700; font-size:14px; color:var(--signal-ink); text-decoration:none; }
+  .is-hidden{ display:none !important; }
+  .flash{ outline:3px solid var(--signal); outline-offset:3px; }
+  @media (max-width:900px){ .featured{ grid-template-columns:1fr; } .grid3{ grid-template-columns:1fr; } }
+
+  /* ---------- routes table ---------- */
+  .routes{ border:1px solid var(--line); border-radius:18px; overflow:hidden; background:var(--surface); }
+  .rrow{ display:grid; grid-template-columns:1.4fr .8fr .8fr .7fr auto; gap:16px; align-items:center; padding:20px 24px; border-top:1px solid var(--line); }
+  .rrow:first-child{ border-top:none; }
+  .rrow.head{ background:var(--bg-2); font-size:11.5px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-2); padding-top:14px; padding-bottom:14px; }
+  .rrow .name{ font-family:"Newsreader",serif; font-size:19px; font-weight:600; }
+  .rrow .name small{ display:block; font-family:"Archivo",sans-serif; font-size:13px; font-weight:400; color:var(--ink-2); }
+  .rrow .t{ font-family:"IBM Plex Mono",monospace; font-size:14.5px; }
+  @media (max-width:760px){
+    .rrow{ grid-template-columns:1fr auto; }
+    .rrow.head{ display:none; }
+    .rrow .t{ text-align:right; }
+    .rrow .dur{ display:none; }
+  }
+
+  /* ---------- on board ---------- */
+  .onboard{ background:var(--pine-2); color:var(--on-pine); }
+  .onboard .cols{ display:grid; grid-template-columns:1fr 1fr; gap:44px; align-items:center; }
+  .onboard figure{ border-radius:18px; overflow:hidden; }
+  .onboard figure img{ width:100%; height:100%; object-fit:cover; }
+  .onboard h2{ font-family:"Newsreader",serif; font-weight:500; font-size:clamp(30px,4vw,42px); line-height:1.1; }
+  .onboard p.intro{ color:var(--on-pine-2); margin-top:14px; max-width:48ch; }
+  .feat{ margin-top:26px; display:grid; gap:0; }
+  .feat li{ display:flex; gap:16px; padding:16px 0; border-top:1px solid rgba(243,236,219,.18); }
+  .feat .n{ font-family:"IBM Plex Mono",monospace; color:#F0B429; font-size:13px; padding-top:3px; }
+  .feat b{ display:block; font-size:16px; }
+  .feat span{ color:var(--on-pine-2); font-size:14.5px; }
+  @media (max-width:900px){ .onboard .cols{ grid-template-columns:1fr; } }
+
+  /* ---------- cabins ---------- */
+  .tier{ border:1px solid var(--line); background:var(--surface); border-radius:18px; padding:28px; display:flex; flex-direction:column; gap:14px; }
+  .tier.mid{ background:var(--pine); color:var(--on-pine); border-color:var(--pine); }
+  .tier h3{ font-family:"Newsreader",serif; font-size:24px; font-weight:600; }
+  .tier .amt{ font-size:15px; color:var(--ink-2); } .tier.mid .amt{ color:var(--on-pine-2); }
+  .tier .amt b{ font-size:34px; color:var(--ink); font-family:"Newsreader",serif; } .tier.mid .amt b{ color:var(--on-pine); }
+  .tier ul{ display:grid; gap:9px; font-size:14.5px; color:var(--ink-2); }
+  .tier.mid ul{ color:var(--on-pine-2); }
+  .tier li::before{ content:"— "; color:var(--signal); }
+  .tier .btn{ margin-top:auto; justify-content:center; }
+  .tier.mid .btn{ background:var(--signal); border-color:var(--signal); color:#FFF6E8; }
+
+  /* ---------- journal ---------- */
+  .jrow{ display:grid; grid-template-columns:110px 1fr auto; gap:22px; align-items:baseline; padding:24px 0; border-top:1px solid var(--line); text-decoration:none; }
+  .jrow:last-child{ border-bottom:1px solid var(--line); }
+  .jrow .d{ font-family:"IBM Plex Mono",monospace; font-size:12.5px; color:var(--ink-2); }
+  .jrow h3{ font-family:"Newsreader",serif; font-size:23px; font-weight:600; line-height:1.2; }
+  .jrow p{ color:var(--ink-2); font-size:14.5px; margin-top:4px; max-width:56ch; }
+  .jrow .mins{ font-family:"IBM Plex Mono",monospace; font-size:12.5px; color:var(--ink-2); white-space:nowrap; }
+  @media (max-width:760px){ .jrow{ grid-template-columns:1fr; gap:6px; } }
+
+  /* ---------- faq ---------- */
+  .faq{ max-width:760px; }
+  .qa{ border:1px solid var(--line); border-radius:14px; background:var(--surface); margin-bottom:12px; overflow:hidden; }
+  .qa button{ width:100%; display:flex; justify-content:space-between; align-items:center; gap:16px; background:none; border:none; padding:20px 22px; font-weight:600; font-size:16px; color:var(--ink); text-align:left; }
+  .qa .pm{ font-family:"Newsreader",serif; font-size:24px; line-height:1; color:var(--signal-ink); flex:none; }
+  .qa .ans{ display:none; padding:0 22px 20px; color:var(--ink-2); font-size:15px; }
+  .qa.open .ans{ display:block; }
+
+  /* ---------- cta + footer ---------- */
+  .cta{ background:var(--signal); color:#FFF3E4; }
+  .cta .wrap{ display:flex; align-items:center; justify-content:space-between; gap:28px; flex-wrap:wrap; padding-top:52px; padding-bottom:52px; }
+  .cta h2{ font-family:"Newsreader",serif; font-weight:500; font-size:clamp(28px,4vw,40px); line-height:1.1; max-width:22ch; }
+  .cta .btn{ background:#16211B; border-color:#16211B; color:#F6F1E7; }
+  footer.site{ border-top:1px solid var(--line); padding:44px 0 54px; }
+  footer.site .cols{ display:flex; justify-content:space-between; gap:32px; flex-wrap:wrap; }
+  footer.site nav{ display:flex; gap:20px; flex-wrap:wrap; }
+  footer.site nav a{ font-size:14px; color:var(--ink-2); text-decoration:none; }
+  footer.site .fine{ margin-top:26px; font-size:13px; color:var(--ink-2); }
+
+  /* ---------- BITON submission spec ---------- */
+  .biton{ background:#101010; color:#FFF1DF; padding:72px 0 84px; }
+  .biton .kicker{ display:inline-flex; align-items:center; gap:10px; font-family:"IBM Plex Mono",monospace; font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:#FF8A70; border:1px solid #3A3A3A; padding:7px 14px; border-radius:999px; }
+  .biton .kicker .dia{ width:9px; height:9px; background:#FF5938; transform:rotate(45deg); }
+  .biton h2{ font-family:"Newsreader",serif; font-weight:500; font-size:clamp(30px,4vw,44px); margin-top:22px; line-height:1.08; }
+  .biton p.sub{ color:#CFC4AE; max-width:58ch; margin-top:12px; }
+  .spec{ margin-top:36px; display:grid; grid-template-columns:1fr 1fr; gap:22px; }
+  .panel{ border:1px solid #333; border-radius:16px; padding:26px; background:#161616; }
+  .panel h3{ font-size:13px; letter-spacing:.12em; text-transform:uppercase; color:#FF8A70; font-weight:700; margin-bottom:18px; }
+  .kv{ display:grid; grid-template-columns:118px 1fr; gap:8px 16px; font-size:14.5px; }
+  .kv dt{ color:#9A917E; } .kv dd{ margin:0; font-weight:500; }
+  .kv dd.mono{ font-size:13px; color:#FFD9CE; word-break:break-all; }
+  .swatches{ display:grid; gap:10px; }
+  .sw{ display:flex; align-items:center; gap:12px; font-size:14px; }
+  .sw .chipc{ width:38px; height:38px; border-radius:10px; border:1px solid #3A3A3A; flex:none; }
+  .sw .hex{ margin-left:auto; font-family:"IBM Plex Mono",monospace; font-size:12.5px; color:#CFC4AE; }
+  .sw button, .copybtn{ background:#FFF1DF; color:#101010; border:none; border-radius:8px; padding:6px 12px; font-size:12.5px; font-weight:700; }
+  .sw button:hover, .copybtn:hover{ background:#FF5938; color:#101010; }
+  .promptbox{ background:#0A0A0A; border:1px solid #333; border-radius:12px; padding:16px; font-family:"IBM Plex Mono",monospace; font-size:13px; line-height:1.6; color:#E9DFC9; overflow-wrap:anywhere; }
+  .biton .actions{ display:flex; gap:12px; flex-wrap:wrap; margin-top:22px; }
+  .biton .actions .btn{ background:#FF5938; border-color:#FF5938; color:#101010; }
+  .biton .actions .btn.ghostb{ background:transparent; border-color:#4A4A4A; color:#FFF1DF; }
+  .sections-list{ display:flex; flex-wrap:wrap; gap:8px; }
+  .sections-list span{ border:1px solid #3A3A3A; border-radius:999px; padding:5px 12px; font-size:13px; color:#E9DFC9; }
+  @media (max-width:900px){ .spec{ grid-template-columns:1fr; } .kv{ grid-template-columns:96px 1fr; } }
+
+  .toast{ position:fixed; left:50%; bottom:26px; transform:translate(-50%,80px); background:#16211B; color:#F6F1E7; padding:12px 20px; border-radius:999px; font-size:14px; font-weight:600; box-shadow:0 14px 34px rgba(0,0,0,.35); transition:transform .3s ease; z-index:80; max-width:92vw; text-align:center; }
+  .toast.show{ transform:translate(-50%,0); }
+  @media (prefers-reduced-motion: reduce){ html{ scroll-behavior:auto; } .jcard, .jcard figure img, .btn{ transition:none; } }
+</style>
+</head>
+<body>
+
+<header class="site">
+  <div class="wrap nav">
+    <a class="wordmark" href="#top"><span class="dia"></span>NORTHBOUND</a>
+    <nav aria-label="Primary">
+      <a href="#journeys">Journeys</a>
+      <a href="#routes">Routes</a>
+      <a href="#onboard">On board</a>
+      <a href="#cabins">Cabins</a>
+      <a href="#journal">Journal</a>
+      <a href="#faq">FAQ</a>
+    </nav>
+    <div class="spacer"></div>
+    <a class="btn signal small" href="#journeys">Plan a journey</a>
+  </div>
+</header>
+
+<main id="top">
+
+  <!-- HERO -->
+  <section class="hero">
+    <figure><img src="assets/hero.jpg" alt="A red panoramic train curving through a green Alpine valley beneath snow-covered peaks" /></figure>
+    <div class="veil"></div>
+    <div class="hero-copy">
+      <div class="wrap">
+        <span class="route-tag">Scenic rail · Alps · Coast · Forest</span>
+        <h1>Travel at the speed of the <em>landscape.</em></h1>
+        <p class="lede">Northbound runs panoramic trains on the routes flights fly over — glacier crossings, coastal lines and forest night trains, booked in one place with every stop on the map.</p>
+        <form class="planner" id="planner">
+          <div>
+            <label for="p-route">Journey</label>
+            <select id="p-route">
+              <option value="glacier">The Glacier Crossing</option>
+              <option value="bernina">Bernina Line</option>
+              <option value="coastal">Coastal Pacific</option>
+              <option value="forest">The Forest Night Train</option>
+            </select>
+          </div>
+          <div>
+            <label for="p-month">Month</label>
+            <select id="p-month">
+              <option>November 2026</option><option>December 2026</option>
+              <option>January 2027</option><option>February 2027</option><option>March 2027</option>
+            </select>
+          </div>
+          <div>
+            <label for="p-cabin">Cabin</label>
+            <select id="p-cabin">
+              <option>Vista Seat</option><option>Roomette</option><option>Panorama Suite</option>
+            </select>
+          </div>
+          <button class="btn signal go" type="submit">Find my train</button>
+          <p class="note" id="planner-note" role="status"></p>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- STATS -->
+  <div class="stats">
+    <div class="wrap">
+      <div class="stat"><b>12</b><span>scenic routes in the timetable</span></div>
+      <div class="stat"><b>196</b><span>bridges across the Albula–Bernina lines</span></div>
+      <div class="stat"><b>55</b><span>tunnels carved through the Alps</span></div>
+      <div class="stat"><b>0</b><span>airport queues, middle seats, or baggage carousels</span></div>
+    </div>
+  </div>
+
+  <!-- JOURNEYS -->
+  <section class="block" id="journeys">
+    <div class="wrap">
+      <div class="sec-head">
+        <div>
+          <h2>Journeys worth the long way round</h2>
+          <p>Four signature routes, each built around the view. Filter by the landscape you want to wake up in.</p>
+        </div>
+        <div class="chips" role="group" aria-label="Filter journeys by landscape">
+          <button class="chip" data-filter="all" aria-pressed="true">All</button>
+          <button class="chip" data-filter="alpine" aria-pressed="false">Alpine</button>
+          <button class="chip" data-filter="coast" aria-pressed="false">Coast</button>
+          <button class="chip" data-filter="forest" aria-pressed="false">Forest</button>
+          <button class="chip" data-filter="night" aria-pressed="false">Night trains</button>
+        </div>
+      </div>
+
+      <article class="featured" data-region="alpine" data-id="glacier">
+        <figure><img src="assets/hero.jpg" alt="Panoramic train rounding a bend below glaciated Alpine peaks" /></figure>
+        <div class="body">
+          <div class="tagrow"><span class="tag hot">Featured</span><span class="tag">Alpine</span><span class="tag">Full day</span></div>
+          <h3>The Glacier Crossing</h3>
+          <p>The flagship run: eight hours between two valley towns, over the highest rail pass in the range and past three glaciers close enough to hear them crack. Lunch is served in the dining car as the line climbs.</p>
+          <div class="meta"><span>Duration <b>8 h 04</b></span><span>Distance <b>291 km</b></span><span>Highest point <b>2,253 m</b></span></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;">
+            <span class="price">from <b>$189</b></span>
+            <a class="link-arrow" href="#routes">See departures →</a>
+          </div>
+        </div>
+      </article>
+
+      <div class="grid3">
+        <article class="jcard" data-region="alpine" data-id="bernina">
+          <figure><img src="assets/alpine.jpg" alt="A long red train crossing a high Alpine valley in autumn light" /></figure>
+          <div class="body">
+            <div class="tagrow"><span class="tag">Alpine</span><span class="tag">Half day</span></div>
+            <h3>Bernina Line</h3>
+            <p>Palm trees to glaciers in four hours. The line loops over the Brusio spiral viaduct and climbs its 7% gradient without a single rack rail.</p>
+            <div class="meta"><span><b>4 h 12</b></span><span><b>144 km</b></span></div>
+          </div>
+          <div class="foot"><span class="price">from <b>$96</b></span><a class="link-arrow" href="#routes">Departures →</a></div>
+        </article>
+
+        <article class="jcard" data-region="coast" data-id="coastal">
+          <figure><img src="assets/coastal.jpg" alt="A coastal train running along cliffs above a turquoise sea" /></figure>
+          <div class="body">
+            <div class="tagrow"><span class="tag">Coast</span><span class="tag">Full day</span></div>
+            <h3>Coastal Pacific</h3>
+            <p>Six hours with the ocean on one side and the ranges on the other — seal colonies, river mouths, and a shoreline road that gives up and turns inland.</p>
+            <div class="meta"><span><b>5 h 48</b></span><span><b>348 km</b></span></div>
+          </div>
+          <div class="foot"><span class="price">from <b>$124</b></span><a class="link-arrow" href="#routes">Departures →</a></div>
+        </article>
+
+        <article class="jcard" data-region="forest night" data-id="forest">
+          <figure><img src="assets/forest.webp" alt="A train passing through dense green forest" /></figure>
+          <div class="body">
+            <div class="tagrow"><span class="tag">Forest</span><span class="tag">Night train</span></div>
+            <h3>The Forest Night Train</h3>
+            <p>Board at dusk, dine as the pines close in, and sleep through the deep forest. You wake at the lake town terminus with breakfast already on.</p>
+            <div class="meta"><span><b>11 h 30</b></span><span><b>Overnight</b></span></div>
+          </div>
+          <div class="foot"><span class="price">from <b>$142</b></span><a class="link-arrow" href="#routes">Departures →</a></div>
+        </article>
+      </div>
+      <p id="filter-empty" class="is-hidden" style="margin-top:18px;color:var(--ink-2);">No journeys in that landscape yet — try another filter.</p>
+    </div>
+  </section>
+
+  <!-- ROUTES -->
+  <section class="block tight" id="routes" style="background:var(--bg-2);border-top:1px solid var(--line);border-bottom:1px solid var(--line);">
+    <div class="wrap">
+      <div class="sec-head">
+        <div>
+          <h2>Daily departures</h2>
+          <p>One timetable, no codeshares or connections to decode. Every train below runs daily.</p>
+        </div>
+      </div>
+      <div class="routes">
+        <div class="rrow head"><span>Journey</span><span>Departs</span><span>Arrives</span><span>Duration</span><span></span></div>
+        <div class="rrow"><span class="name">The Glacier Crossing<small>via the Oberalp Pass</small></span><span class="t">08:52</span><span class="t">16:56</span><span class="t dur">8 h 04</span><a class="link-arrow" href="#cabins">Cabins →</a></div>
+        <div class="rrow"><span class="name">Bernina Line<small>via the Brusio spiral viaduct</small></span><span class="t">09:17</span><span class="t">13:29</span><span class="t dur">4 h 12</span><a class="link-arrow" href="#cabins">Cabins →</a></div>
+        <div class="rrow"><span class="name">Coastal Pacific<small>via the Kaikōura coast</small></span><span class="t">07:04</span><span class="t">12:52</span><span class="t dur">5 h 48</span><a class="link-arrow" href="#cabins">Cabins →</a></div>
+        <div class="rrow"><span class="name">The Forest Night Train<small>sleeper service, dinner included</small></span><span class="t">21:40</span><span class="t">09:10</span><span class="t dur">11 h 30</span><a class="link-arrow" href="#cabins">Cabins →</a></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ON BOARD -->
+  <section class="onboard block" id="onboard">
+    <div class="wrap cols">
+      <figure><img src="assets/interior.jpg" alt="Inside a panoramic observation car with armchairs facing wide windows" /></figure>
+      <div>
+        <h2>Built around the window, not the aisle.</h2>
+        <p class="intro">Every Northbound train is specified for looking out of: raised seating, glass that wraps into the roofline, and a timetable that slows down where the view earns it.</p>
+        <ul class="feat">
+          <li><span class="n">01</span><div><b>Observation car</b><span>Swivel armchairs and a wraparound glass dome on every departure, open to all cabins.</span></div></li>
+          <li><span class="n">02</span><div><b>Dining car</b><span>Regional menus matched to the line — glacier-water trout in the Alps, coastal catch on the Pacific run.</span></div></li>
+          <li><span class="n">03</span><div><b>Quiet car</b><span>No calls, no announcements, lights dimmed after 22:00 on night services.</span></div></li>
+          <li><span class="n">04</span><div><b>Route commentary</b><span>A printed field guide per seat and live position on the carriage screens — no app download needed.</span></div></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- CABINS -->
+  <section class="block" id="cabins">
+    <div class="wrap">
+      <div class="sec-head">
+        <div>
+          <h2>Three ways to ride</h2>
+          <p>Same train, same view. Pick how much of it you want to sleep through.</p>
+        </div>
+      </div>
+      <div class="grid3">
+        <article class="tier">
+          <h3>Vista Seat</h3>
+          <p class="amt"><b>$96</b> from, per person</p>
+          <ul><li>Panoramic window seat, extra legroom</li><li>Observation and dining car access</li><li>Printed route field guide</li><li>One checked bag included</li></ul>
+          <a class="btn ghost" href="#faq">Questions first</a>
+        </article>
+        <article class="tier mid">
+          <h3>Roomette</h3>
+          <p class="amt"><b>$210</b> from, per person</p>
+          <ul><li>Private cabin converting to a bed</li><li>Dinner and breakfast included</li><li>Priority observation car seating</li><li>Two checked bags included</li></ul>
+          <a class="btn" href="#journeys">Choose a journey</a>
+        </article>
+        <article class="tier">
+          <h3>Panorama Suite</h3>
+          <p class="amt"><b>$390</b> from, per person</p>
+          <ul><li>Corner suite with wrap-around glass</li><li>All meals and drinks included</li><li>En-suite shower and lounge access</li><li>Flexible date changes, free</li></ul>
+          <a class="btn ghost" href="#faq">Questions first</a>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- JOURNAL -->
+  <section class="block tight" id="journal" style="border-top:1px solid var(--line);">
+    <div class="wrap">
+      <div class="sec-head">
+        <div>
+          <h2>From the journal</h2>
+          <p>Field notes from the lines — engineering, history, and what to watch for at kilometre 214.</p>
+        </div>
+      </div>
+      <a class="jrow" href="#journal"><span class="d">OCT 2026</span><span><h3>How do you build a railway over a glacier?</h3><p>The Oberalp section sits on ground that moves a metre a year. The engineers' answer involves bridges designed to be re-levelled, not rebuilt.</p></span><span class="mins">8 min read</span></a>
+      <a class="jrow" href="#journal"><span class="d">SEP 2026</span><span><h3>The viaduct that curves into a tunnel</h3><p>On the Albula Line, the most photographed bridge in the Alps ends mid-air — inside a cliff. A short history of the Landwasser Viaduct.</p></span><span class="mins">6 min read</span></a>
+      <a class="jrow" href="#journal"><span class="d">AUG 2026</span><span><h3>A field guide to watching the coast go by</h3><p>Seal colonies at kilometre 96, the river mouth at 141, and the exact bend where the ranges first appear. Tear-out notes for the Coastal Pacific.</p></span><span class="mins">5 min read</span></a>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="block tight" id="faq">
+    <div class="wrap">
+      <div class="sec-head"><div><h2>Before you book</h2></div></div>
+      <div class="faq">
+        <div class="qa"><button aria-expanded="false">Do I need to reserve a seat in the observation car?<span class="pm">+</span></button><div class="ans">No. The observation car is open to every cabin on a first-come basis, and Roomette and Suite passengers can reserve a two-hour window at no charge when they book.</div></div>
+        <div class="qa"><button aria-expanded="false">What happens if snow closes the pass?<span class="pm">+</span></button><div class="ans">Alpine services carry a weather guarantee: if the line closes, you choose between the next day's departure with a hotel night included, or a full refund. No rebooking fees either way.</div></div>
+        <div class="qa"><button aria-expanded="false">Can I break the journey and stop overnight?<span class="pm">+</span></button><div class="ans">Yes — every ticket allows one stopover of up to 48 hours at any intermediate station on the route, at no extra fare. Add it when you book or at the station ticket office.</div></div>
+        <div class="qa"><button aria-expanded="false">Is there Wi-Fi on board?<span class="pm">+</span></button><div class="ans">There is Wi-Fi in stations and the dining car, but the high sections of the Alpine lines have no signal at all — which most passengers end up counting as a feature. Download the field guide before you board.</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta">
+    <div class="wrap">
+      <h2>The window seat is the destination.</h2>
+      <a class="btn" href="#journeys">Browse journeys</a>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site">
+  <div class="wrap">
+    <div class="cols">
+      <a class="wordmark" href="#top"><span class="dia"></span>NORTHBOUND</a>
+      <nav aria-label="Footer">
+        <a href="#journeys">Journeys</a><a href="#routes">Routes</a><a href="#onboard">On board</a>
+        <a href="#cabins">Cabins</a><a href="#journal">Journal</a><a href="#faq">FAQ</a><a href="#biton-entry">BITON entry</a>
+      </nav>
+    </div>
+    <p class="fine">Northbound Rail Co. — a design exemplar. Photography: Bernina &amp; Albula lines (Andreas Stutz via Eurotrek / MySwitzerland), Coastal Pacific (ToursByLocals), observation car (IRT Society).</p>
+  </div>
+</footer>
+
+<!-- ============ BITON SUBMISSION SPEC ============ -->
+<section class="biton" id="biton-entry">
+  <div class="wrap">
+    <span class="kicker"><span class="dia"></span>BITON entry · ready to submit</span>
+    <h2>Add this design to BITON</h2>
+    <p class="sub">Everything a BITON design page needs is documented below — identity, palette, type, structure, and the prompt an AI agent can build from. Copy any piece, or take the whole entry as JSON.</p>
+
+    <div class="spec">
+      <div class="panel">
+        <h3>Entry details</h3>
+        <dl class="kv">
+          <dt>Title</dt><dd>Northbound — Rail Journeys</dd>
+          <dt>URL</dt><dd class="mono">biton.dev/designs/northbound-rail-journeys</dd>
+          <dt>Category</dt><dd>Websites · Travel</dd>
+          <dt>Platform</dt><dd>Web (responsive, desktop → mobile)</dd>
+          <dt>Style</dt><dd>Editorial · Minimal</dd>
+          <dt>Type</dt><dd>Landing page with booking planner</dd>
+          <dt>Sections</dt><dd>9 — listed beside</dd>
+        </dl>
+        <h3 style="margin-top:26px;">Sections in this design</h3>
+        <div class="sections-list">
+          <span>Hero + planner</span><span>Stat strip</span><span>Journey cards</span><span>Timetable</span><span>On board</span><span>Cabin pricing</span><span>Journal index</span><span>FAQ accordion</span><span>CTA band</span>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3>Colour palette — tap to copy</h3>
+        <div class="swatches">
+          <div class="sw"><span class="chipc" style="background:#F6F1E7"></span>Paper Cream<span class="hex">#F6F1E7</span><button data-copy="#F6F1E7">Copy</button></div>
+          <div class="sw"><span class="chipc" style="background:#16211B"></span>Forest Ink<span class="hex">#16211B</span><button data-copy="#16211B">Copy</button></div>
+          <div class="sw"><span class="chipc" style="background:#274435"></span>Pine<span class="hex">#274435</span><button data-copy="#274435">Copy</button></div>
+          <div class="sw"><span class="chipc" style="background:#C2491D"></span>Signal Red<span class="hex">#C2491D</span><button data-copy="#C2491D">Copy</button></div>
+          <div class="sw"><span class="chipc" style="background:#B98A2F"></span>Brass<span class="hex">#B98A2F</span><button data-copy="#B98A2F">Copy</button></div>
+        </div>
+        <h3 style="margin-top:26px;">Typography &amp; spacing</h3>
+        <dl class="kv">
+          <dt>Display</dt><dd>Newsreader (serif, 500–600)</dd>
+          <dt>UI / body</dt><dd>Archivo (400–800)</dd>
+          <dt>Data</dt><dd>IBM Plex Mono — times, prices, specs</dd>
+          <dt>Grid</dt><dd>1,180 px max, 24 px gutters</dd>
+          <dt>Spacing</dt><dd>8 px base scale · 84 px section rhythm</dd>
+          <dt>Corners</dt><dd>14–18 px cards · pill buttons &amp; chips</dd>
+        </dl>
+      </div>
+    </div>
+
+    <div class="panel" style="margin-top:22px;">
+      <h3>Get it for an AI agent</h3>
+      <p class="promptbox" id="agent-prompt">daemon create a website using https://biton.dev/designs/northbound-rail-journeys — an editorial rail-journey landing page called Northbound. Paper cream background (#F6F1E7), forest ink text (#16211B), pine panels (#274435), signal red accent (#C2491D). Newsreader serif headlines, Archivo body, IBM Plex Mono for times and prices. Sections in order: sticky nav, full-bleed hero photo with a journey planner bar (journey / month / cabin selects), stat strip, filterable journey cards, daily departures timetable, dark on-board feature section, three cabin pricing tiers, journal index rows, FAQ accordion, signal-red CTA band. Responsive to mobile, supports dark mode.</p>
+      <div class="actions">
+        <button class="btn" id="copy-prompt">Copy agent prompt</button>
+        <button class="btn ghostb" id="copy-json">Copy entry as JSON</button>
+        <button class="btn ghostb" id="download-page">Download this page (.html)</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function(){
+  var toast = document.getElementById('toast'), toastTimer = null;
+  function showToast(msg){
+    toast.textContent = msg;
+    toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ toast.classList.remove('show'); }, 2600);
+  }
+  function copyText(text, msg){
+    function done(){ showToast(msg); }
+    if (navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(done).catch(function(){ fallback(); });
+    } else { fallback(); }
+    function fallback(){
+      var ta = document.createElement('textarea');
+      ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.select();
+      try { document.execCommand('copy'); } catch(e){}
+      document.body.removeChild(ta); done();
+    }
+  }
+
+  /* Journey filter chips */
+  var chips = Array.prototype.slice.call(document.querySelectorAll('.chip'));
+  var cards = Array.prototype.slice.call(document.querySelectorAll('[data-region]'));
+  var featured = document.querySelector('.featured');
+  var emptyMsg = document.getElementById('filter-empty');
+  function applyFilter(f){
+    chips.forEach(function(c){ c.setAttribute('aria-pressed', c.getAttribute('data-filter') === f ? 'true' : 'false'); });
+    var visible = 0;
+    cards.forEach(function(card){
+      var regions = (card.getAttribute('data-region') || '').split(' ');
+      var show = (f === 'all' || regions.indexOf(f) !== -1);
+      card.classList.toggle('is-hidden', !show);
+      if (show) visible++;
+    });
+    emptyMsg.classList.toggle('is-hidden', visible !== 0);
+  }
+  chips.forEach(function(c){ c.addEventListener('click', function(){ applyFilter(c.getAttribute('data-filter')); }); });
+
+  /* Planner */
+  var names = { glacier:'The Glacier Crossing', bernina:'Bernina Line', coastal:'Coastal Pacific', forest:'The Forest Night Train' };
+  document.getElementById('planner').addEventListener('submit', function(e){
+    e.preventDefault();
+    var id = document.getElementById('p-route').value;
+    var month = document.getElementById('p-month').value;
+    var cabin = document.getElementById('p-cabin').value;
+    applyFilter('all');
+    var target = document.querySelector('[data-id="' + id + '"]');
+    document.getElementById('planner-note').textContent = names[id] + ' · ' + month + ' · ' + cabin + ' — highlighted below.';
+    if (target){
+      target.scrollIntoView({ behavior:'smooth', block:'center' });
+      target.classList.add('flash');
+      setTimeout(function(){ target.classList.remove('flash'); }, 2400);
+    }
+  });
+
+  /* FAQ */
+  Array.prototype.forEach.call(document.querySelectorAll('.qa'), function(qa){
+    var btn = qa.querySelector('button');
+    btn.addEventListener('click', function(){
+      var open = qa.classList.toggle('open');
+      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+      qa.querySelector('.pm').textContent = open ? '–' : '+';
+    });
+  });
+
+  /* BITON spec: copy helpers */
+  Array.prototype.forEach.call(document.querySelectorAll('[data-copy]'), function(b){
+    b.addEventListener('click', function(){ copyText(b.getAttribute('data-copy'), 'Copied ' + b.getAttribute('data-copy')); });
+  });
+  document.getElementById('copy-prompt').addEventListener('click', function(){
+    copyText(document.getElementById('agent-prompt').textContent.trim(), 'Agent prompt copied');
+  });
+  document.getElementById('copy-json').addEventListener('click', function(){
+    var entry = {
+      title: 'Northbound — Rail Journeys',
+      url: 'https://biton.dev/designs/northbound-rail-journeys',
+      category: 'Websites',
+      subcategory: 'Travel',
+      platform: ['Web'],
+      style: ['Editorial', 'Minimal'],
+      type: 'Landing page with booking planner',
+      palette: { paper:'#F6F1E7', ink:'#16211B', pine:'#274435', signal:'#C2491D', brass:'#B98A2F' },
+      typography: { display:'Newsreader', body:'Archivo', data:'IBM Plex Mono' },
+      layout: { maxWidth:'1180px', gutter:'24px', spacingScale:'8px', sectionRhythm:'84px', cardRadius:'14-18px' },
+      sections: ['Hero + journey planner','Stat strip','Journey cards with landscape filters','Daily departures timetable','On board feature section','Cabin pricing tiers','Journal index','FAQ accordion','CTA band'],
+      responsive: 'Desktop grid collapses to single column under 900px; planner and timetable reflow under 760px; dark mode supported.'
+    };
+    copyText(JSON.stringify(entry, null, 2), 'BITON entry JSON copied');
+  });
+  document.getElementById('download-page').addEventListener('click', function(){
+    var html = '<!doctype html>\n' + document.documentElement.outerHTML;
+    var blob = new Blob([html], { type:'text/html' });
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'northbound-rail-journeys.html';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(function(){ URL.revokeObjectURL(a.href); }, 2000);
+    showToast('Page downloaded — keep it beside its assets/ folder for the photos');
+  });
+})();
+</script>
+</body>
+</html>
