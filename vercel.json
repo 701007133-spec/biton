@@ -2,7 +2,16 @@
   "version": 2,
   "framework": null,
   "outputDirectory": ".",
+  "functions": {
+    "api/page.js": {
+      "includeFiles": "categories/**/*.html"
+    }
+  },
   "rewrites": [
+    {
+      "source": "/:slug",
+      "destination": "/api/page?slug=:slug"
+    },
     {
       "source": "/(.*)",
       "destination": "/index.html"

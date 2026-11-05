@@ -11,9 +11,9 @@ Open `index.html` in a browser, or serve this folder with any static file server
 ## Project files
 
 - `index.html` contains the complete single-page site, its concept catalogue, styles, and scripts.
-- `contributions/` contains category-specific, browser-based contribution instructions. Submissions arrive as pull requests and are not published automatically.
+- `categories/` holds complete HTML pages, organized by category. A page such as `categories/mobile-apps/vault-x.html` is served at `/vault-x` after it is merged to the main branch.
 - `LICENSE` contains the MIT License for the source code. The BITON name and logo are brand assets and are not licensed by that code license.
 
-## Contribute without installing anything
+## Add a webpage without installing anything
 
-Choose a category in the site's contribution section, edit the suggested JSON file in GitHub's web editor, and open a pull request. A GitHub account is required, but no local tools are needed. Contributions remain pending until reviewed; accepted concepts can then be moved into the catalogue.
+Choose a category in the site's contribution section, create a complete `.html` file in that folder using GitHub's web editor, and open a pull request. No local tools are needed. After review and merge, the page is available at a clean URL based on its filename: `vault-x.html` becomes `/vault-x`. Pages are served as HTML, not listed as data or imported into BITON's concept catalogue.
