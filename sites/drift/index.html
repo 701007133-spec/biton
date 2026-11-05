@@ -4,84 +4,511 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <title>Drift — Short vertical video, that keeps going</title>
-<meta name="description" content="Drift is a TikTok-style vertical video feed. Six real AI-generated clips from Still Standing, Part 2 — swipe up, tap to play or pause, tap the heart to like." />
+<meta name="description" content="Drift is a TikTok-style vertical video app. For You feed, Discover, upload your own clip, comments, likes, and a profile — built on the 6 real AI-generated clips from Still Standing, Part 2." />
 <style>
 *{box-sizing:border-box}
 html,body{margin:0;height:100%;background:#000;color:#fff;font-family:Inter,system-ui,sans-serif;overflow:hidden}
-header{position:fixed;top:0;left:0;right:0;z-index:10;display:flex;justify-content:space-between;align-items:center;padding:14px 18px;background:linear-gradient(180deg,rgba(0,0,0,.7),transparent);pointer-events:none}
-header b{font-size:22px;letter-spacing:-.02em}
-header span{font-size:12px;color:#ddd}
-.feed{height:100dvh;overflow-y:auto;scroll-snap-type:y mandatory;scrollbar-width:none}
-.feed::-webkit-scrollbar{display:none}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+input,textarea{font:inherit;color:#fff}
+a{color:inherit}
+:root{--pink:#FE2C55;--pink-dark:#E01E48}
+.topbar{position:fixed;top:0;left:0;right:0;z-index:20;display:flex;justify-content:space-between;align-items:center;padding:14px 16px;background:linear-gradient(180deg,rgba(0,0,0,.75),transparent);pointer-events:none}
+.topbar b{font-size:22px;letter-spacing:-.02em}
+.topbar .sub{font-size:12px;color:#ddd}
+.topbar>*{pointer-events:auto}
+.feedtabs{position:fixed;top:14px;left:50%;transform:translateX(-50%);z-index:21;display:flex;gap:18px;font-size:15px;font-weight:600}
+.feedtabs button{color:#bbb;padding:4px 2px}
+.feedtabs button.on{color:#fff;border-bottom:2px solid #fff}
+.soundbtn{position:fixed;top:56px;right:14px;z-index:21;background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.35);border-radius:999px;padding:7px 12px;font-size:12px}
+.view{display:none;height:100dvh}
+.view.on{display:block}
+#feed{overflow-y:auto;scroll-snap-type:y mandatory;scrollbar-width:none}
+#feed::-webkit-scrollbar{display:none}
 .clip{position:relative;height:100dvh;scroll-snap-align:start;scroll-snap-stop:always;display:flex;align-items:flex-end;justify-content:center;background:#111}
 .clip video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-.info{position:relative;z-index:2;width:100%;max-width:520px;padding:0 18px 28px}
-.info h2{margin:0 0 4px;font-size:19px}
-.info p{margin:0 0 12px;color:#e5e5e5;font-size:14px}
-.meta{display:flex;gap:10px;align-items:center}
-.handle{font-weight:700;font-size:14px}
+.info{position:relative;z-index:2;width:100%;max-width:520px;padding:0 78px 96px 16px}
+.info h2{margin:6px 0 4px;font-size:19px}
+.info p{margin:0;color:#e5e5e5;font-size:14px}
+.meta{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.handle{font-weight:700;font-size:15px}
+.followbtn{border:1px solid #fff;border-radius:999px;padding:3px 12px;font-size:12px;font-weight:700}
+.followbtn.following{background:#fff;color:#000;border-color:#fff}
 .tag{font-size:12px;color:#ccc}
-.actions{position:absolute;right:14px;bottom:110px;z-index:3;display:flex;flex-direction:column;gap:18px;align-items:center}
-.actions button{background:rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.35);color:#fff;border-radius:999px;width:52px;height:52px;font-size:22px;cursor:pointer}
-.actions button.liked{background:#FE2C55;border-color:#FE2C55}
-.actions span{font-size:12px;margin-top:-12px}
+.actions{position:absolute;right:12px;bottom:120px;z-index:3;display:flex;flex-direction:column;gap:16px;align-items:center}
+.act{display:flex;flex-direction:column;align-items:center;gap:3px}
+.act button{background:rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.35);border-radius:999px;width:52px;height:52px;font-size:22px}
+.act button.liked{background:var(--pink);border-color:var(--pink)}
+.act span{font-size:11px;color:#eee}
 .progress{position:absolute;left:0;right:0;bottom:0;height:3px;background:rgba(255,255,255,.25);z-index:3}
-.progress i{display:block;height:100%;width:0;background:#FE2C55}
-.hint{position:fixed;bottom:14px;left:50%;transform:translateX(-50%);z-index:10;font-size:12px;color:#ddd;background:rgba(0,0,0,.5);padding:6px 12px;border-radius:999px}
-footer{position:fixed;left:0;right:0;bottom:0;height:0}
+.progress i{display:block;height:100%;width:0;background:var(--pink)}
+.big-heart{position:absolute;left:50%;top:42%;transform:translate(-50%,-50%) scale(0);z-index:4;font-size:90px;color:var(--pink);pointer-events:none;text-shadow:0 4px 30px rgba(0,0,0,.5)}
+.big-heart.pop{animation:pop .6s ease forwards}
+@keyframes pop{0%{transform:translate(-50%,-50%) scale(0)}30%{transform:translate(-50%,-50%) scale(1.2)}60%{transform:translate(-50%,-50%) scale(1)}100%{transform:translate(-50%,-50%) scale(1);opacity:0}}
+.pause-badge{position:absolute;left:50%;top:42%;transform:translate(-50%,-50%);z-index:4;font-size:64px;opacity:.85;display:none;pointer-events:none}
+.hint{position:fixed;bottom:74px;left:50%;transform:translateX(-50%);z-index:10;font-size:12px;color:#ddd;background:rgba(0,0,0,.55);padding:6px 12px;border-radius:999px;white-space:nowrap}
+.toast{position:fixed;bottom:120px;left:50%;transform:translateX(-50%);z-index:40;background:#fff;color:#000;padding:9px 16px;border-radius:999px;font-size:13px;font-weight:600;display:none;box-shadow:0 8px 30px rgba(0,0,0,.5)}
+.endcard{position:relative;height:100dvh;scroll-snap-align:start;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:#0b0b0f;text-align:center;padding:0 24px 90px}
+.endcard h2{font-size:26px;margin:0}
+.endcard p{color:#aaa;margin:0;max-width:320px}
+.btn{display:inline-block;background:var(--pink);color:#fff;font-weight:700;text-decoration:none;padding:12px 22px;border-radius:999px;border:0}
+.btn.ghost{background:transparent;border:1px solid rgba(255,255,255,.4)}
+/* bottom nav */
+.bottomnav{position:fixed;left:0;right:0;bottom:0;z-index:30;display:flex;justify-content:space-around;align-items:center;height:62px;padding-bottom:env(safe-area-inset-bottom);background:linear-gradient(0deg,rgba(0,0,0,.92),rgba(0,0,0,.75))}
+.bottomnav button{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:10px;color:#bbb;padding:6px 10px}
+.bottomnav button.on{color:#fff}
+.bottomnav button .ic{font-size:20px;line-height:1}
+.create-btn{width:46px;height:32px;border-radius:9px;background:linear-gradient(90deg,#25F4EE 0 33%,#fff 33% 66%,var(--pink) 66%);display:grid;place-items:center;color:#000;font-size:20px;font-weight:800}
+/* sub-pages */
+.page{overflow-y:auto;height:100dvh;padding:70px 16px 90px;scrollbar-width:none}
+.page::-webkit-scrollbar{display:none}
+.page h1{font-size:26px;margin:0 0 4px}
+.page .lede{color:#aaa;font-size:13px;margin:0 0 16px}
+.searchbar{width:100%;height:42px;border:1px solid rgba(255,255,255,.2);background:#111;border-radius:999px;padding:0 16px;font-size:14px;outline:none}
+.searchbar:focus{border-color:var(--pink)}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}
+.chip{border:1px solid rgba(255,255,255,.25);border-radius:999px;padding:7px 13px;font-size:12px;color:#ddd}
+.chip.on{background:#fff;color:#000;border-color:#fff}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:3px}
+.tile{position:relative;aspect-ratio:9/16;background:#1a1a1a;border-radius:6px;overflow:hidden;text-align:left;padding:0}
+.tile video{width:100%;height:100%;object-fit:cover;display:block}
+.tile .cap{position:absolute;left:0;right:0;bottom:0;padding:18px 7px 7px;background:linear-gradient(0deg,rgba(0,0,0,.8),transparent);font-size:11px;font-weight:600;text-align:left}
+.tile .dur{position:absolute;top:6px;right:6px;background:rgba(0,0,0,.6);border-radius:99px;padding:2px 7px;font-size:10px}
+.empty{border:1px dashed rgba(255,255,255,.25);border-radius:14px;padding:28px 18px;text-align:center;color:#aaa;font-size:13px;line-height:1.6;margin-top:10px}
+.empty b{color:#fff;display:block;font-size:15px;margin-bottom:4px}
+/* comments sheet */
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:50;height:70dvh;max-width:520px;margin:0 auto;background:#121212;border-radius:18px 18px 0 0;display:none;flex-direction:column;box-shadow:0 -10px 40px rgba(0,0,0,.6)}
+.sheet.on{display:flex}
+.sheet header{padding:14px 16px;border-bottom:1px solid rgba(255,255,255,.12);display:flex;justify-content:space-between;align-items:center;font-weight:700}
+.sheet .list{flex:1;overflow-y:auto;padding:12px 16px;display:flex;flex-direction:column;gap:14px}
+.comment{display:flex;gap:10px}
+.comment .av{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#666,#222);display:grid;place-items:center;font-size:13px;flex:none}
+.comment b{font-size:13px}
+.comment p{margin:2px 0 0;font-size:13px;color:#ddd}
+.sheet form{display:flex;gap:8px;padding:12px;border-top:1px solid rgba(255,255,255,.12)}
+.sheet form input{flex:1;height:42px;border:1px solid rgba(255,255,255,.2);background:#1c1c1c;border-radius:999px;padding:0 14px;font-size:14px;outline:none}
+.sheet form button{background:var(--pink);border-radius:999px;padding:0 18px;font-weight:700}
+/* profile */
+.profile-head{display:flex;gap:16px;align-items:center;margin:8px 0 14px}
+.avatar{width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,#FE2C55,#25F4EE);display:grid;place-items:center;font-size:30px;flex:none}
+.stats{display:flex;gap:18px;text-align:center}
+.stats b{display:block;font-size:17px}
+.stats span{font-size:11px;color:#aaa}
+.bio{font-size:13px;color:#ddd;margin:0 0 16px;line-height:1.6}
+.tabs{display:flex;border-bottom:1px solid rgba(255,255,255,.15);margin-bottom:3px}
+.tabs button{flex:1;padding:11px;font-size:13px;color:#aaa;font-weight:600}
+.tabs button.on{color:#fff;border-bottom:2px solid #fff}
+/* create */
+.field{margin-bottom:14px}
+.field label{display:block;font-size:12px;color:#aaa;margin-bottom:6px}
+.field input,.field textarea{width:100%;border:1px solid rgba(255,255,255,.2);background:#111;border-radius:10px;padding:11px 13px;font-size:14px;outline:none}
+.field input:focus,.field textarea:focus{border-color:var(--pink)}
+.drop{border:1px dashed rgba(255,255,255,.35);border-radius:14px;padding:22px;text-align:center;color:#aaa;font-size:13px}
+.drop video{width:100%;max-height:300px;border-radius:10px;background:#000}
+.note{font-size:12px;color:#888;line-height:1.6}
+/* inbox */
+.notif{display:flex;gap:12px;padding:14px 4px;border-bottom:1px solid rgba(255,255,255,.08);align-items:flex-start}
+.notif .ic{width:38px;height:38px;border-radius:50%;background:#1e1e1e;display:grid;place-items:center;font-size:17px;flex:none}
+.notif p{margin:0;font-size:13px;line-height:1.55;color:#ddd}
+.notif p b{color:#fff}
+.notif time{font-size:11px;color:#888}
+@media(min-width:700px){.page,.sheet{max-width:520px;margin-left:auto;margin-right:auto}.bottomnav{max-width:520px;margin:0 auto;left:0;right:0}}
+@media(max-width:650px){.topbar .sub{display:none}.feedtabs{gap:14px;font-size:14px}}
 </style>
 </head>
 <body>
-<header><b>Drift</b><span>AI-generated clips · Still Standing, Part 2</span></header>
-<main class="feed" id="feed"></main>
-<div class="hint">Scroll to swipe · Tap video to play / pause</div>
+<div class="topbar" id="topbar"><b>Drift</b><span class="sub">Still Standing · Part 2</span></div>
+<div class="feedtabs" id="feedtabs"><button id="tabForYou" class="on">For You</button><button id="tabFollowing">Following</button></div>
+<button class="soundbtn" id="soundBtn" type="button">🔇 Sound off</button>
+
+<main class="view on" id="feed"></main>
+
+<section class="view page" id="discover">
+  <h1>Discover</h1>
+  <p class="lede">Every clip in Drift, searchable. Tap one to watch it in the feed.</p>
+  <input class="searchbar" id="discoverSearch" type="search" placeholder="Search clips, titles, tags..." aria-label="Search clips" />
+  <div class="chips" id="tagChips"></div>
+  <div class="grid" id="discoverGrid"></div>
+  <div class="empty" id="discoverEmpty" style="display:none"><b>No clips match that</b>Try a different word or tag.</div>
+</section>
+
+<section class="view page" id="create">
+  <h1>Make a Drift</h1>
+  <p class="lede">Upload a short vertical video from your device and add it to the feed.</p>
+  <div class="field"><label>Your video</label><div class="drop" id="drop"><input type="file" id="fileInput" accept="video/*" style="display:none" /><button type="button" id="pickBtn" class="btn ghost">Choose a video</button><p>MP4 or MOV, vertical works best.</p><video id="previewVideo" style="display:none" controls muted loop playsinline></video></div></div>
+  <div class="field"><label for="upTitle">Title</label><input id="upTitle" maxlength="60" placeholder="e.g. The comeback" /></div>
+  <div class="field"><label for="upCaption">Caption</label><textarea id="upCaption" rows="2" maxlength="140" placeholder="One line about this clip..."></textarea></div>
+  <button class="btn" id="publishBtn" type="button" style="width:100%">Publish to the feed</button>
+  <p class="note">Your clip is added to the feed, Discover, and your profile for this browser session. Drift doesn't upload it to a server yet — close the tab and it's gone.</p>
+</section>
+
+<section class="view page" id="inbox">
+  <h1>Inbox</h1>
+  <p class="lede">Your activity in Drift. Nothing here comes from anyone else — these are your own likes, follows, and comments.</p>
+  <div id="activityList"></div>
+  <div class="empty" id="inboxEmpty" style="display:none"><b>Nothing yet</b>Like a clip, follow @stillstanding, or leave a comment — it'll show up here.</div>
+  <button class="btn ghost" id="clearActivity" type="button" style="margin-top:16px">Clear activity</button>
+</section>
+
+<section class="view page" id="profile">
+  <h1 style="display:none">Profile</h1>
+  <div class="profile-head">
+    <div class="avatar">✦</div>
+    <div>
+      <div style="font-size:18px;font-weight:800">@stillstanding</div>
+      <div class="stats" style="margin-top:8px">
+        <div><b id="statVideos">6</b><span>Videos</span></div>
+        <div><b id="statLikes">0</b><span>Likes given</span></div>
+        <div><b id="statFollowing">0</b><span>Following</span></div>
+      </div>
+    </div>
+  </div>
+  <p class="bio">Still Standing — a 60-second story about not quitting. Six AI-generated clips, one rooftop sunrise. Made for Drift.</p>
+  <div style="display:flex;gap:10px;margin-bottom:16px"><button class="btn" id="profileFollow" type="button" style="flex:1">Follow</button><button class="btn ghost" id="profileShare" type="button">Share profile</button></div>
+  <div class="tabs"><button id="tabVideos" class="on">Videos</button><button id="tabLiked">Liked</button></div>
+  <div class="grid" id="profileGrid" style="margin-top:3px"></div>
+  <div class="empty" id="profileEmpty" style="display:none"><b>No liked clips yet</b>Tap the heart on any clip and it'll live here.</div>
+</section>
+
+<nav class="bottomnav" id="bottomnav">
+  <button data-view="feed" class="on"><span class="ic">⌂</span>Home</button>
+  <button data-view="discover"><span class="ic">⌕</span>Discover</button>
+  <button data-view="create" aria-label="Create"><span class="create-btn">+</span></button>
+  <button data-view="inbox"><span class="ic">✉</span>Inbox</button>
+  <button data-view="profile"><span class="ic">◉</span>Me</button>
+</nav>
+
+<div class="hint" id="hint">Scroll to swipe · Tap video to play / pause · Double-tap to like</div>
+<div class="toast" id="toast"></div>
+
+<div class="sheet" id="sheet" role="dialog" aria-label="Comments">
+  <header><span id="sheetTitle">Comments</span><button type="button" id="sheetClose" aria-label="Close comments">✕</button></header>
+  <div class="list" id="commentList"></div>
+  <form id="commentForm"><input id="commentInput" maxlength="140" placeholder="Add a comment..." aria-label="Add a comment" /><button type="submit">Post</button></form>
+</div>
+
 <script>
 var clips = [
-  {src:"/sites/drift/assets/clip1.mp4", handle:"@stillstanding", title:"The call", text:"One phone call. Everything changes after this."},
-  {src:"/sites/drift/assets/clip2.mp4", handle:"@stillstanding", title:"The pitch", text:"A cafe, a pitch, and a room full of doubt."},
-  {src:"/sites/drift/assets/clip3.mp4", handle:"@stillstanding", title:"First yes", text:"The first yes is the loudest one."},
-  {src:"/sites/drift/assets/clip4.mp4", handle:"@stillstanding", title:"Night grind", text:"Nobody sees the night grind."},
-  {src:"/sites/drift/assets/clip5.mp4", handle:"@stillstanding", title:"The crowd", text:"Then the crowd shows up."},
-  {src:"/sites/drift/assets/clip6.mp4", handle:"@stillstanding", title:"Still standing", text:"Keep going. That's the whole story."}
+  {src:"/sites/drift/assets/clip1.mp4", handle:"@stillstanding", title:"The call", text:"One phone call. Everything changes after this.", tags:["Still Standing","phone call","motivation"]},
+  {src:"/sites/drift/assets/clip2.mp4", handle:"@stillstanding", title:"The pitch", text:"A cafe, a pitch, and a room full of doubt.", tags:["Still Standing","cafe","pitch"]},
+  {src:"/sites/drift/assets/clip3.mp4", handle:"@stillstanding", title:"First yes", text:"The first yes is the loudest one.", tags:["Still Standing","first yes","motivation"]},
+  {src:"/sites/drift/assets/clip4.mp4", handle:"@stillstanding", title:"Night grind", text:"Nobody sees the night grind.", tags:["Still Standing","night grind","grind"]},
+  {src:"/sites/drift/assets/clip5.mp4", handle:"@stillstanding", title:"The crowd", text:"Then the crowd shows up.", tags:["Still Standing","crowd","reveal"]},
+  {src:"/sites/drift/assets/clip6.mp4", handle:"@stillstanding", title:"Still standing", text:"Keep going. That's the whole story.", tags:["Still Standing","keep going","motivation"]}
 ];
-var liked = JSON.parse(localStorage.getItem("drift-likes") || "{}");
+function load(k, d){ try { var v = JSON.parse(localStorage.getItem(k)); return v === null || v === undefined ? d : v; } catch(e){ return d; } }
+function save(k, v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch(e){} }
+var liked = load("drift-likes", {});
+var following = load("drift-following", false);
+var comments = load("drift-comments", {});
+var activity = load("drift-activity", []);
+var uploads = []; // session-only: {src, title, text, tags}
+var soundOn = false;
+var feedMode = "foryou";
+var activeTag = "All";
+var profileTab = "videos";
+var currentSheet = -1;
+
+function allClips(){ return uploads.concat(clips); }
+function clipKey(i){ return i < uploads.length ? "u" + i : "c" + (i - uploads.length); }
+function likeCount(i){ return liked[clipKey(i)] ? 1 : 0; }
+function toast(msg){ var t = document.getElementById("toast"); t.textContent = msg; t.style.display = "block"; setTimeout(function(){ t.style.display = "none"; }, 2200); }
+function logActivity(icon, html){ activity.unshift({icon:icon, html:html, at:new Date().toLocaleString()}); save("drift-activity", activity); renderInbox(); }
+
 var feed = document.getElementById("feed");
-clips.forEach(function(c, i){
-  var el = document.createElement("section");
-  el.className = "clip";
-  el.innerHTML = '<video src="' + c.src + '" loop muted playsinline preload="metadata"></video>' +
-    '<div class="actions"><button type="button" aria-label="Like" data-i="' + i + '">' + (liked[i] ? "♥" : "♡") + '</button><span>' + (liked[i] ? "Liked by you" : "Like") + '</span></div>' +
-    '<div class="info"><div class="meta"><span class="handle">' + c.handle + '</span><span class="tag">Clip ' + (i+1) + ' of 6 · 10s · AI-generated</span></div><h2>' + c.title + '</h2><p>' + c.text + '</p></div>' +
-    '<div class="progress"><i></i></div>';
-  feed.appendChild(el);
-});
-var videos = Array.prototype.slice.call(document.querySelectorAll("video"));
-videos.forEach(function(v){
-  v.addEventListener("click", function(){ if (v.paused) v.play(); else v.pause(); });
-  v.addEventListener("timeupdate", function(){
-    var bar = v.parentElement.querySelector(".progress i");
-    if (v.duration) bar.style.width = (v.currentTime / v.duration * 100) + "%";
+function buildFeed(){
+  feed.innerHTML = "";
+  var list = allClips();
+  if (feedMode === "following" && !following){
+    var empty = document.createElement("section");
+    empty.className = "clip";
+    empty.innerHTML = '<div class="endcard" style="position:absolute;inset:0"><h2>You\'re not following anyone yet</h2><p>Follow @stillstanding and their clips will show up here.</p><button class="btn" type="button" id="emptyFollow">Follow @stillstanding</button></div>';
+    feed.appendChild(empty);
+    empty.querySelector("#emptyFollow").addEventListener("click", function(){ setFollowing(true); });
+  }
+  list.forEach(function(c, i){
+    if (feedMode === "following" && !following) return;
+    var key = clipKey(i);
+    var el = document.createElement("section");
+    el.className = "clip";
+    el.dataset.i = i;
+    el.innerHTML =
+      '<video src="' + c.src + '" loop ' + (soundOn ? '' : 'muted') + ' playsinline preload="metadata"></video>' +
+      '<div class="big-heart">♥</div><div class="pause-badge">▶</div>' +
+      '<div class="actions">' +
+        '<div class="act"><button type="button" class="like-btn ' + (liked[key] ? 'liked' : '') + '" aria-label="Like">' + (liked[key] ? '♥' : '♡') + '</button><span class="like-count">' + likeCount(i) + '</span></div>' +
+        '<div class="act"><button type="button" class="comment-btn" aria-label="Comments">💬</button><span>' + ((comments[key] || []).length || 'Comment') + '</span></div>' +
+        '<div class="act"><button type="button" class="share-btn" aria-label="Share">↗</button><span>Share</span></div>' +
+      '</div>' +
+      '<div class="info"><div class="meta"><span class="handle">' + c.handle + '</span>' +
+        (c.handle === '@stillstanding' ? '<button type="button" class="followbtn ' + (following ? 'following' : '') + '">' + (following ? 'Following' : 'Follow') + '</button>' : '') +
+        '<span class="tag">Clip ' + (i+1) + ' of ' + list.length + ' · 10s · AI-generated</span></div>' +
+        '<h2>' + c.title + '</h2><p>' + c.text + '</p></div>' +
+      '<div class="progress"><i></i></div>';
+    feed.appendChild(el);
   });
-});
-document.querySelectorAll(".actions button").forEach(function(b){
-  b.addEventListener("click", function(){
-    var i = b.getAttribute("data-i");
-    liked[i] = !liked[i];
-    localStorage.setItem("drift-likes", JSON.stringify(liked));
-    b.textContent = liked[i] ? "♥" : "♡";
-    b.classList.toggle("liked", !!liked[i]);
-    b.nextElementSibling.textContent = liked[i] ? "Liked by you" : "Like";
+  var end = document.createElement("section");
+  end.className = "endcard";
+  end.innerHTML = '<h2>That\'s the whole story.</h2><p>Six clips, one rooftop sunrise. Keep going — that\'s the whole story.</p><div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center"><button class="btn" type="button" id="replayBtn">↻ Watch again</button><a class="btn ghost" href="#/discover">Browse clips</a></div>';
+  feed.appendChild(end);
+  end.querySelector("#replayBtn").addEventListener("click", function(){ feed.scrollTo({top:0, behavior:"smooth"}); });
+  wireFeed();
+  renderDiscover(); renderProfile();
+}
+
+function wireFeed(){
+  var videos = Array.prototype.slice.call(feed.querySelectorAll("video"));
+  videos.forEach(function(v){
+    var lastTap = 0;
+    v.addEventListener("click", function(){
+      var now = Date.now();
+      if (now - lastTap < 300){ doubleLike(v); lastTap = 0; return; }
+      lastTap = now;
+      setTimeout(function(){
+        if (Date.now() - lastTap < 300) return;
+        var badge = v.parentElement.querySelector(".pause-badge");
+        if (v.paused){ v.play(); badge.style.display = "none"; }
+        else { v.pause(); badge.style.display = "block"; }
+      }, 300);
+    });
+    v.addEventListener("timeupdate", function(){
+      var bar = v.parentElement.querySelector(".progress i");
+      if (v.duration) bar.style.width = (v.currentTime / v.duration * 100) + "%";
+    });
   });
-});
-var observer = new IntersectionObserver(function(entries){
-  entries.forEach(function(e){
-    var v = e.target.querySelector("video");
-    if (!v) return;
-    if (e.intersectionRatio > 0.6) { v.play().catch(function(){}); }
-    else { v.pause(); }
+  feed.querySelectorAll(".like-btn").forEach(function(b){
+    b.addEventListener("click", function(){ toggleLike(parseInt(b.closest(".clip").dataset.i, 10)); });
   });
-}, {threshold:[0, 0.6, 1]});
-document.querySelectorAll(".clip").forEach(function(c){ observer.observe(c); });
+  feed.querySelectorAll(".comment-btn").forEach(function(b){
+    b.addEventListener("click", function(){ openSheet(parseInt(b.closest(".clip").dataset.i, 10)); });
+  });
+  feed.querySelectorAll(".share-btn").forEach(function(b){
+    b.addEventListener("click", function(){ shareClip(parseInt(b.closest(".clip").dataset.i, 10)); });
+  });
+  feed.querySelectorAll(".followbtn").forEach(function(b){
+    b.addEventListener("click", function(){ setFollowing(!following); });
+  });
+  var observer = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      var v = e.target.querySelector("video");
+      if (!v) return;
+      if (e.intersectionRatio > 0.6){ v.muted = !soundOn; v.play().catch(function(){}); }
+      else v.pause();
+    });
+  }, {threshold:[0, 0.6, 1]});
+  feed.querySelectorAll(".clip").forEach(function(c){ observer.observe(c); });
+}
+
+function toggleLike(i, silent){
+  var key = clipKey(i);
+  liked[key] = !liked[key];
+  save("drift-likes", liked);
+  var list = allClips();
+  if (liked[key] && !silent) logActivity("♥", "You liked <b>" + list[i].title + "</b>.");
+  buildFeed();
+  renderProfile();
+  var el = feed.querySelector('.clip[data-i="' + i + '"]');
+  if (el){ var v = el.querySelector("video"); if (v && v.paused) v.play().catch(function(){}); }
+}
+function doubleLike(v){
+  var i = parseInt(v.parentElement.dataset.i, 10);
+  var key = clipKey(i);
+  var heart = v.parentElement.querySelector(".big-heart");
+  heart.classList.remove("pop"); void heart.offsetWidth; heart.classList.add("pop");
+  if (!liked[key]) toggleLike(i);
+}
+function setFollowing(val){
+  following = val;
+  save("drift-following", following);
+  if (val) logActivity("＋", "You followed <b>@stillstanding</b>.");
+  buildFeed();
+  renderProfile();
+  toast(val ? "Following @stillstanding" : "Unfollowed @stillstanding");
+}
+function shareClip(i){
+  var url = "https://biton.is-a.dev/drift#clip-" + (i+1);
+  if (navigator.clipboard){ navigator.clipboard.writeText(url).then(function(){ toast("Link copied"); }, function(){ toast(url); }); }
+  else toast(url);
+}
+function openSheet(i){
+  currentSheet = i;
+  var list = allClips();
+  document.getElementById("sheetTitle").textContent = "Comments · " + list[i].title;
+  renderComments();
+  document.getElementById("sheet").classList.add("on");
+}
+function renderComments(){
+  var key = clipKey(currentSheet);
+  var list = comments[key] || [];
+  var box = document.getElementById("commentList");
+  box.innerHTML = list.length ? "" : '<div class="empty"><b>No comments yet</b>Be the first to say something about this clip.</div>';
+  list.forEach(function(c){
+    var d = document.createElement("div");
+    d.className = "comment";
+    d.innerHTML = '<div class="av">Y</div><div><b>You</b><p></p></div>';
+    d.querySelector("p").textContent = c.text;
+    box.appendChild(d);
+  });
+  box.scrollTop = box.scrollHeight;
+}
+document.getElementById("sheetClose").addEventListener("click", function(){ document.getElementById("sheet").classList.remove("on"); });
+document.getElementById("commentForm").addEventListener("submit", function(e){
+  e.preventDefault();
+  var input = document.getElementById("commentInput");
+  var text = input.value.trim();
+  if (!text || currentSheet < 0) return;
+  var key = clipKey(currentSheet);
+  comments[key] = comments[key] || [];
+  comments[key].push({text:text, at:Date.now()});
+  save("drift-comments", comments);
+  logActivity("💬", "You commented on <b>" + allClips()[currentSheet].title + "</b>: “" + text.replace(/</g, "&lt;") + "”");
+  input.value = "";
+  renderComments();
+  buildFeed();
+});
+
+/* Discover */
+var allTags = ["All"];
+clips.forEach(function(c){ c.tags.forEach(function(t){ if (allTags.indexOf(t) === -1) allTags.push(t); }); });
+function renderDiscover(){
+  var chips = document.getElementById("tagChips");
+  chips.innerHTML = "";
+  allTags.forEach(function(t){
+    var b = document.createElement("button");
+    b.type = "button"; b.className = "chip" + (activeTag === t ? " on" : ""); b.textContent = t;
+    b.addEventListener("click", function(){ activeTag = t; renderDiscover(); });
+    chips.appendChild(b);
+  });
+  var q = (document.getElementById("discoverSearch").value || "").trim().toLowerCase();
+  var grid = document.getElementById("discoverGrid");
+  grid.innerHTML = "";
+  var shown = 0;
+  allClips().forEach(function(c, i){
+    var hay = (c.title + " " + c.text + " " + c.tags.join(" ")).toLowerCase();
+    if (q && hay.indexOf(q) === -1) return;
+    if (activeTag !== "All" && c.tags.indexOf(activeTag) === -1) return;
+    shown++;
+    var t = document.createElement("button");
+    t.type = "button"; t.className = "tile";
+    t.innerHTML = '<video src="' + c.src + '" muted playsinline preload="metadata"></video><span class="dur">0:10</span><span class="cap">' + c.title + '</span>';
+    t.addEventListener("click", function(){ showView("feed"); setTimeout(function(){ var el = feed.querySelector('.clip[data-i="' + i + '"]'); if (el) el.scrollIntoView({behavior:"smooth"}); }, 60); });
+    grid.appendChild(t);
+  });
+  document.getElementById("discoverEmpty").style.display = shown ? "none" : "block";
+}
+document.getElementById("discoverSearch").addEventListener("input", renderDiscover);
+
+/* Create / upload */
+var pickedFile = null;
+document.getElementById("pickBtn").addEventListener("click", function(){ document.getElementById("fileInput").click(); });
+document.getElementById("fileInput").addEventListener("change", function(e){
+  pickedFile = e.target.files && e.target.files[0];
+  if (!pickedFile) return;
+  var url = URL.createObjectURL(pickedFile);
+  var pv = document.getElementById("previewVideo");
+  pv.src = url; pv.style.display = "block"; pv.play().catch(function(){});
+  if (!document.getElementById("upTitle").value) document.getElementById("upTitle").value = pickedFile.name.replace(/\.[^.]+$/, "").replace(/[-_]/g, " ");
+});
+document.getElementById("publishBtn").addEventListener("click", function(){
+  if (!pickedFile){ toast("Choose a video first"); return; }
+  var title = document.getElementById("upTitle").value.trim() || "Untitled Drift";
+  var caption = document.getElementById("upCaption").value.trim() || "Made on Drift.";
+  uploads.unshift({src:URL.createObjectURL(pickedFile), handle:"@you", title:title, text:caption, tags:["Your clip"]});
+  logActivity("＋", "You published <b>" + title + "</b> to the feed.");
+  document.getElementById("upTitle").value = ""; document.getElementById("upCaption").value = "";
+  document.getElementById("previewVideo").style.display = "none"; pickedFile = null;
+  buildFeed();
+  showView("feed");
+  toast("Published — it's at the top of your feed");
+});
+
+/* Inbox */
+function renderInbox(){
+  var box = document.getElementById("activityList");
+  box.innerHTML = "";
+  document.getElementById("inboxEmpty").style.display = activity.length ? "none" : "block";
+  activity.forEach(function(a){
+    var d = document.createElement("div");
+    d.className = "notif";
+    d.innerHTML = '<div class="ic">' + a.icon + '</div><div><p>' + a.html + '</p><time>' + a.at + '</time></div>';
+    box.appendChild(d);
+  });
+}
+document.getElementById("clearActivity").addEventListener("click", function(){ activity = []; save("drift-activity", activity); renderInbox(); });
+
+/* Profile */
+function renderProfile(){
+  var list = allClips();
+  document.getElementById("statVideos").textContent = list.length;
+  document.getElementById("statLikes").textContent = Object.keys(liked).filter(function(k){ return liked[k]; }).length;
+  document.getElementById("statFollowing").textContent = following ? 1 : 0;
+  var btn = document.getElementById("profileFollow");
+  btn.textContent = following ? "Following" : "Follow";
+  var grid = document.getElementById("profileGrid");
+  grid.innerHTML = "";
+  var items = profileTab === "liked"
+    ? list.map(function(c, i){ return {c:c, i:i}; }).filter(function(x){ return liked[clipKey(x.i)]; })
+    : list.map(function(c, i){ return {c:c, i:i}; });
+  document.getElementById("profileEmpty").style.display = items.length ? "none" : "block";
+  items.forEach(function(x){
+    var t = document.createElement("button");
+    t.type = "button"; t.className = "tile";
+    t.innerHTML = '<video src="' + x.c.src + '" muted playsinline preload="metadata"></video><span class="dur">0:10</span><span class="cap">' + x.c.title + '</span>';
+    t.addEventListener("click", function(){ showView("feed"); setTimeout(function(){ var el = feed.querySelector('.clip[data-i="' + x.i + '"]'); if (el) el.scrollIntoView({behavior:"smooth"}); }, 60); });
+    grid.appendChild(t);
+  });
+}
+document.getElementById("tabVideos").addEventListener("click", function(){ profileTab = "videos"; document.getElementById("tabVideos").classList.add("on"); document.getElementById("tabLiked").classList.remove("on"); renderProfile(); });
+document.getElementById("tabLiked").addEventListener("click", function(){ profileTab = "liked"; document.getElementById("tabLiked").classList.add("on"); document.getElementById("tabVideos").classList.remove("on"); renderProfile(); });
+document.getElementById("profileFollow").addEventListener("click", function(){ setFollowing(!following); });
+document.getElementById("profileShare").addEventListener("click", function(){
+  var url = "https://biton.is-a.dev/drift";
+  if (navigator.clipboard) navigator.clipboard.writeText(url).then(function(){ toast("Profile link copied"); });
+});
+
+/* Views + routing */
+var viewIds = ["feed", "discover", "create", "inbox", "profile"];
+function showView(v){
+  viewIds.forEach(function(id){ document.getElementById(id).classList.toggle("on", id === v); });
+  document.querySelectorAll(".bottomnav button").forEach(function(b){ b.classList.toggle("on", b.dataset.view === v); });
+  var isFeed = v === "feed";
+  document.getElementById("feedtabs").style.display = isFeed ? "flex" : "none";
+  document.getElementById("soundBtn").style.display = isFeed ? "block" : "none";
+  document.getElementById("hint").style.display = isFeed ? "block" : "none";
+  document.getElementById("topbar").style.display = isFeed ? "flex" : "none";
+  if (v === "inbox") renderInbox();
+  if (v === "profile") renderProfile();
+  if (v === "discover") renderDiscover();
+  if (!isFeed){ feed.querySelectorAll("video").forEach(function(vid){ vid.pause(); }); }
+  if (location.hash !== "#/" + v) history.replaceState(null, "", "#/" + v);
+}
+document.querySelectorAll(".bottomnav button").forEach(function(b){
+  b.addEventListener("click", function(){ showView(b.dataset.view); });
+});
+document.getElementById("tabForYou").addEventListener("click", function(){ feedMode = "foryou"; document.getElementById("tabForYou").classList.add("on"); document.getElementById("tabFollowing").classList.remove("on"); buildFeed(); });
+document.getElementById("tabFollowing").addEventListener("click", function(){ feedMode = "following"; document.getElementById("tabFollowing").classList.add("on"); document.getElementById("tabForYou").classList.remove("on"); buildFeed(); });
+document.getElementById("soundBtn").addEventListener("click", function(){
+  soundOn = !soundOn;
+  document.getElementById("soundBtn").textContent = soundOn ? "🔊 Sound on" : "🔇 Sound off";
+  feed.querySelectorAll("video").forEach(function(v){ v.muted = !soundOn; });
+  toast(soundOn ? "Sound on — the clips talk" : "Sound off");
+});
+window.addEventListener("hashchange", function(){
+  var h = location.hash.replace("#/", "");
+  if (viewIds.indexOf(h) !== -1) showView(h);
+  else if (h.indexOf("clip-") === 0){ showView("feed"); }
+});
+buildFeed();
+renderInbox();
+(function(){
+  var h = location.hash.replace("#/", "");
+  if (viewIds.indexOf(h) !== -1) showView(h);
+  else if (h.indexOf("clip-") === 0){
+    showView("feed");
+    var n = parseInt(h.replace("clip-", ""), 10) - 1;
+    setTimeout(function(){ var el = feed.querySelector('.clip[data-i="' + n + '"]'); if (el) el.scrollIntoView(); }, 300);
+  }
+})();
+setTimeout(function(){ document.getElementById("hint").style.display = "none"; }, 6000);
 </script>
 </body>
 </html>
