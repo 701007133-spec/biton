@@ -26,8 +26,14 @@ a{color:inherit}
 #feed::-webkit-scrollbar{display:none}
 .clip{position:relative;height:100dvh;scroll-snap-align:start;scroll-snap-stop:always;display:flex;align-items:flex-end;justify-content:center;background:#111}
 .clip video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.clip::after{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;background:linear-gradient(180deg,rgba(0,0,0,.35),transparent 22%,transparent 55%,rgba(0,0,0,.72));}
+.disc{position:absolute;right:14px;top:112px;z-index:3;width:44px;height:44px;border-radius:50%;background:conic-gradient(#FE2C55,#25F4EE,#FE2C55);display:grid;place-items:center;animation:spinRing 4s linear infinite;box-shadow:0 4px 18px rgba(0,0,0,.5)}
+.disc i{width:18px;height:18px;border-radius:50%;background:#111;border:2px solid #fff;display:block}
 .info{position:relative;z-index:2;width:100%;max-width:520px;padding:0 78px 96px 16px}
-.info h2{margin:6px 0 4px;font-size:19px}
+.music{margin-top:10px;font-size:12px;color:#eee;overflow:hidden;white-space:nowrap;max-width:260px}
+.music span{display:inline-block;padding-left:100%;animation:marquee 9s linear infinite}
+@keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-100%)}}
+.info h2{margin:6px 0 4px;font-size:19px;text-shadow:0 2px 12px rgba(0,0,0,.6)}
 .info p{margin:0;color:#e5e5e5;font-size:14px}
 .meta{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 .handle{font-weight:700;font-size:15px}
@@ -36,7 +42,9 @@ a{color:inherit}
 .tag{font-size:12px;color:#ccc}
 .actions{position:absolute;right:12px;bottom:120px;z-index:3;display:flex;flex-direction:column;gap:16px;align-items:center}
 .act{display:flex;flex-direction:column;align-items:center;gap:3px}
-.act button{background:rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.35);border-radius:999px;width:52px;height:52px;font-size:22px}
+.act button{background:rgba(20,20,20,.5);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.35);border-radius:999px;width:52px;height:52px;font-size:22px;transition:transform .18s ease,background .2s ease}
+.act button:active{transform:scale(.88)}
+.act span{font-size:11px;color:#eee;text-shadow:0 1px 6px rgba(0,0,0,.6)}
 .act button.liked{background:var(--pink);border-color:var(--pink)}
 .act span{font-size:11px;color:#eee}
 .progress{position:absolute;left:0;right:0;bottom:0;height:3px;background:rgba(255,255,255,.25);z-index:3}
@@ -69,7 +77,8 @@ a{color:inherit}
 .chip{border:1px solid rgba(255,255,255,.25);border-radius:999px;padding:7px 13px;font-size:12px;color:#ddd}
 .chip.on{background:#fff;color:#000;border-color:#fff}
 .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:3px}
-.tile{position:relative;aspect-ratio:9/16;background:#1a1a1a;border-radius:6px;overflow:hidden;text-align:left;padding:0}
+.tile{position:relative;aspect-ratio:9/16;background:#1a1a1a;border-radius:10px;overflow:hidden;text-align:left;padding:0;transition:transform .25s ease,box-shadow .25s ease}
+.tile:hover{transform:scale(1.03);box-shadow:0 10px 30px rgba(0,0,0,.55)}
 .tile video{width:100%;height:100%;object-fit:cover;display:block}
 .tile .cap{position:absolute;left:0;right:0;bottom:0;padding:18px 7px 7px;background:linear-gradient(0deg,rgba(0,0,0,.8),transparent);font-size:11px;font-weight:600;text-align:left}
 .tile .dur{position:absolute;top:6px;right:6px;background:rgba(0,0,0,.6);border-radius:99px;padding:2px 7px;font-size:10px}
@@ -111,7 +120,42 @@ a{color:inherit}
 .notif p{margin:0;font-size:13px;line-height:1.55;color:#ddd}
 .notif p b{color:#fff}
 .notif time{font-size:11px;color:#888}
-@media(min-width:700px){.page,.sheet{max-width:520px;margin-left:auto;margin-right:auto}.bottomnav{max-width:520px;margin:0 auto;left:0;right:0}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes viewIn{from{opacity:0;transform:translateY(10px) scale(.995)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes popIn{0%{transform:scale(.6)}55%{transform:scale(1.25)}100%{transform:scale(1)}}
+@keyframes sheetUp{from{transform:translateY(40px);opacity:0}to{transform:translateY(0);opacity:1}}
+@keyframes toastUp{from{opacity:0;transform:translate(-50%,10px)}to{opacity:1;transform:translate(-50%,0)}}
+@keyframes glowPulse{0%,100%{box-shadow:0 0 0 0 rgba(254,44,85,.45)}50%{box-shadow:0 0 0 7px rgba(254,44,85,0)}}
+@keyframes floatY{0%,100%{transform:translateY(0) rotate(4deg)}50%{transform:translateY(-6px) rotate(4deg)}}
+@keyframes spinRing{to{transform:rotate(360deg)}}
+@keyframes shimmer{from{background-position:200% 0}to{background-position:-200% 0}}
+@keyframes navPop{0%{transform:scale(1)}40%{transform:scale(1.35)}100%{transform:scale(1)}}
+.view.on{animation:viewIn .28s ease both}
+.clip .info,.clip .actions{opacity:0;transform:translateY(16px);transition:opacity .45s ease,transform .45s ease}
+.clip.in-view .info,.clip.in-view .actions{opacity:1;transform:translateY(0)}
+.clip.in-view .actions{transition-delay:.08s}
+.tile{animation:fadeUp .3s ease both;animation-delay:var(--d,0s)}
+.tile .cap{animation:fadeIn .5s ease .15s both}
+.like-btn.liked{animation:popIn .35s ease}
+.followbtn{transition:transform .18s ease,background .2s ease,color .2s ease}
+.followbtn:active{transform:scale(.92)}
+.bottomnav button.on .ic{display:inline-block;animation:navPop .3s ease}
+.create-btn{animation:glowPulse 2.2s ease-in-out infinite}
+.avatar{position:relative}
+.avatar::after{content:"";position:absolute;inset:-5px;border-radius:50%;border:2px solid transparent;border-top-color:#FE2C55;border-right-color:#25F4EE;animation:spinRing 3s linear infinite}
+.sheet.on{animation:sheetUp .3s ease both}
+.toast{animation:toastUp .25s ease both}
+.searchbar{transition:border-color .2s ease,box-shadow .2s ease}
+.searchbar:focus{box-shadow:0 0 0 3px rgba(254,44,85,.25)}
+.chip{transition:transform .15s ease,background .2s ease,color .2s ease}
+.chip:active{transform:scale(.94)}
+.endcard h2{animation:fadeUp .5s ease both}
+.endcard p{animation:fadeUp .5s ease .1s both}
+.endcard .btn{animation:fadeUp .5s ease .2s both}
+.progress i{transition:width .2s linear}
+.topbar b{animation:fadeUp .4s ease both}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important}}
 @media(max-width:650px){.topbar .sub{display:none}.feedtabs{gap:14px;font-size:14px}}
 </style>
 </head>
@@ -233,7 +277,7 @@ function buildFeed(){
     el.dataset.i = i;
     el.innerHTML =
       '<video src="' + c.src + '" loop ' + (soundOn ? '' : 'muted') + ' playsinline preload="metadata"></video>' +
-      '<div class="big-heart">♥</div><div class="pause-badge">▶</div>' +
+      '<div class="big-heart">♥</div><div class="pause-badge">▶</div><div class="disc"><i></i></div>' +
       '<div class="actions">' +
         '<div class="act"><button type="button" class="like-btn ' + (liked[key] ? 'liked' : '') + '" aria-label="Like">' + (liked[key] ? '♥' : '♡') + '</button><span class="like-count">' + likeCount(i) + '</span></div>' +
         '<div class="act"><button type="button" class="comment-btn" aria-label="Comments">💬</button><span>' + ((comments[key] || []).length || 'Comment') + '</span></div>' +
@@ -242,7 +286,7 @@ function buildFeed(){
       '<div class="info"><div class="meta"><span class="handle">' + c.handle + '</span>' +
         (c.handle === '@stillstanding' ? '<button type="button" class="followbtn ' + (following ? 'following' : '') + '">' + (following ? 'Following' : 'Follow') + '</button>' : '') +
         '<span class="tag">Clip ' + (i+1) + ' of ' + list.length + ' · 10s · AI-generated</span></div>' +
-        '<h2>' + c.title + '</h2><p>' + c.text + '</p></div>' +
+        '<h2>' + c.title + '</h2><p>' + c.text + '</p><div class="music"><span>♪ Still Standing · original sound · Keep going ♪&nbsp;</span></div></div>' +
       '<div class="progress"><i></i></div>';
     feed.appendChild(el);
   });
@@ -290,6 +334,7 @@ function wireFeed(){
   var observer = new IntersectionObserver(function(entries){
     entries.forEach(function(e){
       var v = e.target.querySelector("video");
+      e.target.classList.toggle("in-view", e.intersectionRatio > 0.6);
       if (!v) return;
       if (e.intersectionRatio > 0.6){ v.muted = !soundOn; v.play().catch(function(){}); }
       else v.pause();
@@ -389,6 +434,7 @@ function renderDiscover(){
     shown++;
     var t = document.createElement("button");
     t.type = "button"; t.className = "tile";
+    t.style.setProperty("--d", (shown % 6) * 0.05 + "s");
     t.innerHTML = '<video src="' + c.src + '" muted playsinline preload="metadata"></video><span class="dur">0:10</span><span class="cap">' + c.title + '</span>';
     t.addEventListener("click", function(){ showView("feed"); setTimeout(function(){ var el = feed.querySelector('.clip[data-i="' + i + '"]'); if (el) el.scrollIntoView({behavior:"smooth"}); }, 60); });
     grid.appendChild(t);
@@ -452,6 +498,7 @@ function renderProfile(){
   items.forEach(function(x){
     var t = document.createElement("button");
     t.type = "button"; t.className = "tile";
+    t.style.setProperty("--d", (items.indexOf(x) % 6) * 0.05 + "s");
     t.innerHTML = '<video src="' + x.c.src + '" muted playsinline preload="metadata"></video><span class="dur">0:10</span><span class="cap">' + x.c.title + '</span>';
     t.addEventListener("click", function(){ showView("feed"); setTimeout(function(){ var el = feed.querySelector('.clip[data-i="' + x.i + '"]'); if (el) el.scrollIntoView({behavior:"smooth"}); }, 60); });
     grid.appendChild(t);
