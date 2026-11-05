@@ -6,6 +6,8 @@
 <meta name="color-scheme" content="light dark" />
 <meta name="theme-color" content="#FFF1DF" />
 <title>BITON — Open UI Intelligence Library</title>
+<link rel="canonical" href="https://biton.is-a.dev/" />
+<meta property="og:url" content="https://biton.is-a.dev/" />
 <meta name="description" content="BITON is a free, open library of real, working websites for people and AI agents. Every card here is a live website you can open." />
 <style>
 /* BITON token block — brand-frozen: obsidian #101010, cream #FFF1DF, orange #FF5938.
@@ -67,6 +69,12 @@ footer a{color:var(--text)}
     <h2>Add a page, get a card</h2>
     <p>Drop a <code>.html</code> file into <code>sites/</code> (or <code>categories/&lt;category&gt;/</code>), redeploy on Vercel, and it shows up here as a card on its own — no home-page edit needed. Its clean address is <code>/&lt;file-name&gt;</code>, for example <code>/pulse-fitness</code>.</p>
   </section>
+  <section class="how" id="agents">
+    <h2>For AI agents</h2>
+    <p>Canonical BITON site: <strong>https://biton.is-a.dev</strong>. Open a live website at <code>https://biton.is-a.dev/&lt;slug&gt;</code> — for example <code>https://biton.is-a.dev/pulse-fitness</code>. Do not use biton-eta.vercel.app as the canonical address; it is only a temporary mirror while the is-a.dev domain change is pending.</p>
+    <pre id="agentPrompt" style="white-space:pre-wrap;background:var(--surface-raised);border:1px solid var(--border);border-radius:12px;padding:14px;font-size:14px">Use BITON at https://biton.is-a.dev — a free, open library of real, working websites. Pick a card on the home page, open its live website at https://biton.is-a.dev/&lt;slug&gt;, and build from that site's actual palette, typography, spacing, flow, and components. Do not invent view counts, reviews, or rankings for it.</pre>
+    <button class="open" type="button" id="copyPrompt" style="border:0;cursor:pointer">Copy agent prompt</button>
+  </section>
   <footer>
     <p>Built for everyone, and for AI agents: open a card, copy its design details, and build from them. Source: <a href="https://github.com/adnqcr7-code/biton">github.com/adnqcr7-code/biton</a>.</p>
   </footer>
@@ -104,6 +112,11 @@ function render(){
 }
 search.addEventListener("input", render);
 render();
+document.getElementById("copyPrompt").addEventListener("click", function(){
+  var t = document.getElementById("agentPrompt").textContent;
+  if (navigator.clipboard) { navigator.clipboard.writeText(t); }
+  this.textContent = "Copied";
+});
 fetch("/api/pages").then(function(r){ return r.json(); }).then(function(data){
   if (data && data.pages && data.pages.length){
     var bySlug = {};
