@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Tempo — Focus timer, one session at a time</title>
+<meta name="description" content="Tempo is a Pomodoro focus timer: 25 minutes of work, 5 minutes of rest, with sessions that actually count. No sign-up, nothing leaves your browser." />
+<link rel="stylesheet" href="/sites/tempo/styles.css" />
+</head>
+<body>
+<main class="wrap">
+  <header>
+    <div class="logo">Tempo<span>.</span></div>
+    <p class="tag">Focus, one session at a time.</p>
+  </header>
+
+  <section class="timer-card" id="timerCard">
+    <div class="mode-row" id="modeRow">
+      <button type="button" class="mode on" data-mode="focus">Focus</button>
+      <button type="button" class="mode" data-mode="short">Short break</button>
+      <button type="button" class="mode" data-mode="long">Long break</button>
+    </div>
+    <div class="ring-wrap">
+      <svg class="ring" viewBox="0 0 220 220" aria-hidden="true">
+        <circle class="ring-bg" cx="110" cy="110" r="96" />
+        <circle class="ring-fg" id="ringFg" cx="110" cy="110" r="96" />
+      </svg>
+      <div class="time"><span id="time">25:00</span><small id="phaseLabel">Ready when you are</small></div>
+    </div>
+    <div class="controls">
+      <button type="button" class="btn primary" id="startBtn">Start focus</button>
+      <button type="button" class="btn ghost" id="resetBtn">Reset</button>
+    </div>
+    <p class="hint" id="hint">25 minutes of work, then a 5-minute break. Four focus sessions earn a long break.</p>
+  </section>
+
+  <section class="panel">
+    <h2>Your sessions</h2>
+    <div class="stats">
+      <div><b id="statToday">0</b><span>Focus sessions today</span></div>
+      <div><b id="statTotal">0</b><span>All-time sessions</span></div>
+      <div><b id="statStreak">0</b><span>Day streak</span></div>
+    </div>
+    <div class="dots" id="dots" aria-label="Progress toward long break"></div>
+    <p class="note">Sessions only count when a focus timer actually finishes. Closing the tab mid-session doesn't count it — that's the point.</p>
+  </section>
+
+  <section class="panel">
+    <h2>How it works</h2>
+    <ol class="steps">
+      <li><b>Pick a task.</b> One thing. Write it down if it helps.</li>
+      <li><b>Start focus.</b> 25 minutes, no switching.</li>
+      <li><b>Take the break.</b> 5 minutes after each session, 15 after every fourth.</li>
+    </ol>
+    <label class="field">What are you focusing on?
+      <input id="taskInput" maxlength="80" placeholder="e.g. Finish the maths homework" />
+    </label>
+  </section>
+  <footer><a href="/">← Back to BITON</a> · Tempo is part of BITON — free, no sign-up, nothing leaves your browser.</footer>
+</main>
+<script src="/sites/tempo/app.js"></script>
+</body>
+</html>
