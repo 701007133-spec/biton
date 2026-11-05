@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wanderlust Travel — Plan, Pick, Book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,500;6..72,600;6..72,700&display=swap" rel="stylesheet">
+<style>
+  /* Design system — derived ONLY from the supplied Wanderlust Travel spec.
+     Tokens: 8px grid, radius 16px, section gap 64px.
+     Type: display Newsreader, body Inter. */
+  :root{
+    --bg:#EEF4F7;
+    --surface:#FFFFFF;
+    --text:#0B2233;
+    --muted:#4A6070;
+    --border:#C2D3DC;
+    --primary:#0E6E8C;
+    --radius:16px;
+    --gap-section:64px;
+    --gap-1:8px;
+    --gap-2:16px;
+    --gap-3:24px;
+    --gap-4:32px;
+    --gap-5:40px;
+    --font-display:"Newsreader", Georgia, serif;
+    --font-body:"Inter", system-ui, -apple-system, sans-serif;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:var(--font-body);
+    font-size:16px;
+    line-height:1.6;
+  }
+  a{color:var(--primary)}
+  .wrap{max-width:1104px;margin:0 auto;padding:0 24px}
+  /* NAV — min touch target 44px */
+  .nav{
+    position:sticky;top:0;z-index:10;
+    background:var(--surface);
+    border-bottom:1px solid var(--border);
+  }
+  .nav-inner{
+    max-width:1104px;margin:0 auto;padding:0 24px;
+    min-height:64px;display:flex;align-items:center;justify-content:space-between;gap:16px;
+  }
+  .brand{font-family:var(--font-display);font-size:24px;font-weight:700;letter-spacing:-0.01em;text-decoration:none;color:var(--text)}
+  .brand span{color:var(--primary)}
+  .nav-links{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .nav-links a{
+    color:var(--text);text-decoration:none;font-weight:600;font-size:15px;
+    min-height:44px;display:inline-flex;align-items:center;padding:0 12px;border-radius:12px;
+  }
+  .nav-links a:hover{background:var(--bg)}
+  .btn{
+    display:inline-flex;align-items:center;justify-content:center;
+    min-height:44px;padding:0 20px;border-radius:999px;border:0;cursor:pointer;
+    font-family:var(--font-body);font-weight:700;font-size:16px;text-decoration:none;
+  }
+  .btn-primary{background:var(--primary);color:var(--surface)}
+  .btn-primary:hover{filter:brightness(0.92)}
+  .btn-secondary{background:var(--surface);color:var(--text);border:1.5px solid var(--border)}
+  /* SECTIONS */
+  section{padding:var(--gap-section) 0}
+  .eyebrow{
+    font-size:13px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--primary);margin:0 0 8px;
+  }
+  h1,h2,h3{font-family:var(--font-display);line-height:1.1;letter-spacing:-0.01em;margin:0}
+  h1{font-size:56px;font-weight:700}
+  h2{font-size:36px;font-weight:600}
+  h3{font-size:22px;font-weight:600;line-height:1.3}
+  .lede{color:var(--muted);font-size:18px;line-height:1.6;max-width:640px;margin:16px 0 0}
+  .section-sub{color:var(--muted);margin:12px 0 0;max-width:640px}
+  /* HERO / LAND */
+  .hero{display:grid;grid-template-columns:1.15fr 0.85fr;gap:32px;align-items:start}
+  .hero-steps{display:flex;gap:8px;flex-wrap:wrap;margin-top:24px}
+  .step-pill{
+    background:var(--surface);border:1px solid var(--border);border-radius:999px;
+    min-height:44px;display:inline-flex;align-items:center;padding:0 16px;font-weight:600;font-size:14px;
+  }
+  .step-pill b{color:var(--primary);margin-right:8px}
+  .hero-card{
+    background:var(--primary);color:var(--surface);border-radius:var(--radius);padding:32px;
+  }
+  .hero-card h3{font-family:var(--font-display);font-size:28px;color:var(--surface)}
+  .hero-card p{margin:12px 0 0;opacity:0.92;line-height:1.6}
+  .hero-card ul{margin:16px 0 0;padding-left:20px;line-height:1.7}
+  /* SEARCH / PLANNER */
+  .planner{
+    background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;
+    box-shadow:0 8px 24px rgba(11,34,51,0.06);
+  }
+  .planner-grid{display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:16px;align-items:end}
+  .field label{display:block;font-weight:700;font-size:14px;margin-bottom:8px}
+  .field input,.field select{
+    width:100%;min-height:48px;border:1.5px solid var(--border);border-radius:12px;
+    padding:0 12px;font:inherit;color:var(--text);background:var(--surface);
+  }
+  .field input:focus,.field select:focus{outline:3px solid var(--border);outline-offset:1px;border-color:var(--primary)}
+  .hint{color:var(--muted);font-size:14px;margin:16px 0 0}
+  /* DESTINATION CARDS */
+  .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:32px}
+  .card{
+    background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+    overflow:hidden;display:flex;flex-direction:column;
+  }
+  .card-visual{
+    min-height:160px;display:flex;align-items:flex-end;padding:16px;
+    background:var(--bg);border-bottom:1px solid var(--border);
+  }
+  .card-visual span{
+    background:var(--primary);color:var(--surface);font-weight:700;font-size:13px;
+    padding:6px 10px;border-radius:999px;min-height:28px;display:inline-flex;align-items:center;
+  }
+  .card-body{padding:24px;display:flex;flex-direction:column;gap:8px;flex:1}
+  .card-body p{color:var(--muted);margin:0}
+  .card-meta{display:flex;justify-content:space-between;gap:16px;margin-top:auto;padding-top:16px;border-top:1px solid var(--border);font-weight:700}
+  .card-meta small{display:block;color:var(--muted);font-weight:500}
+  .card-body .btn{margin-top:8px;align-self:flex-start}
+  /* TIMETABLE */
+  .table-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow-x:auto;margin-top:32px}
+  table{width:100%;border-collapse:collapse;min-width:640px}
+  th,td{text-align:left;padding:16px;border-bottom:1px solid var(--border);font-size:15px}
+  th{background:var(--bg);font-weight:700}
+  tr:last-child td{border-bottom:0}
+  td.muted{color:var(--muted)}
+  .tag{display:inline-block;background:var(--bg);border:1px solid var(--border);border-radius:999px;padding:4px 10px;font-size:13px;font-weight:600}
+  /* PRICING */
+  .pricing{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:32px;align-items:stretch}
+  .price{
+    background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;
+    display:flex;flex-direction:column;gap:8px;
+  }
+  .price.featured{border:2px solid var(--primary)}
+  .price .amount{font-family:var(--font-display);font-size:40px;font-weight:700;line-height:1.1}
+  .price .amount small{font-family:var(--font-body);font-size:14px;color:var(--muted);font-weight:500}
+  .price p{color:var(--muted);margin:0}
+  .price ul{margin:8px 0 0;padding-left:20px;color:var(--text);line-height:1.7}
+  .price .btn{margin-top:auto}
+  /* FAQ */
+  .faq{max-width:760px;margin-top:32px;display:grid;gap:16px}
+  details{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 24px}
+  summary{font-weight:700;font-size:17px;cursor:pointer;min-height:44px;display:flex;align-items:center}
+  details p{color:var(--muted);margin:12px 0 0}
+  /* BOOK CTA */
+  .book{
+    background:var(--text);color:var(--surface);border-radius:var(--radius);padding:32px;
+    display:flex;justify-content:space-between;gap:24px;align-items:center;flex-wrap:wrap;
+  }
+  .book h2{color:var(--surface)}
+  .book p{color:var(--surface);opacity:0.88;margin:12px 0 0;max-width:560px}
+  footer{padding:32px 0 48px;color:var(--muted);font-size:14px;line-height:1.6;border-top:1px solid var(--border)}
+  footer strong{color:var(--text)}
+  /* RESPONSIVE — single column at phone width, no horizontal overflow */
+  @media (max-width:820px){
+    h1{font-size:40px}
+    h2{font-size:30px}
+    .hero,.cards,.pricing{grid-template-columns:1fr}
+    .planner-grid{grid-template-columns:1fr}
+    .planner-grid .btn{width:100%}
+    .nav-inner{flex-wrap:wrap;padding-top:8px;padding-bottom:8px}
+    .nav-links{width:100%}
+    .book{flex-direction:column;align-items:stretch}
+    .book .btn{width:100%}
+    table{min-width:560px}
+  }
+  @media (max-width:480px){
+    .wrap,.nav-inner{padding-left:16px;padding-right:16px}
+    section{padding:48px 0}
+    h1{font-size:34px}
+    .hero-card,.planner,.price,.card-body{padding:20px}
+  }
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="nav-inner">
+    <a class="brand" href="#top">Wanderlust <span>Travel</span></a>
+    <nav class="nav-links" aria-label="Primary">
+      <a href="#search">Search</a>
+      <a href="#destinations">Destinations</a>
+      <a href="#timetable">Timetable</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#faq">FAQ</a>
+      <a class="btn btn-primary" href="#book">Book a trip</a>
+    </nav>
+  </div>
+</header>
+
+<main id="top" class="wrap">
+
+  <!-- 1 · LAND -->
+  <section aria-labelledby="hero-title">
+    <div class="hero">
+      <div>
+        <p class="eyebrow">Travel booking, made calm</p>
+        <h1 id="hero-title">Go somewhere worth the journey.</h1>
+        <p class="lede">Search a trip, compare real times and prices, pick the place that fits — then book in a few clear steps. No clutter, no surprise fees at the end.</p>
+        <div class="hero-steps" aria-label="How it works">
+          <span class="step-pill"><b>1</b> Search trip</span>
+          <span class="step-pill"><b>2</b> Pick destination</span>
+          <span class="step-pill"><b>3</b> Book</span>
+        </div>
+        <p style="margin-top:24px;display:flex;gap:12px;flex-wrap:wrap">
+          <a class="btn btn-primary" href="#search">Start searching</a>
+          <a class="btn btn-secondary" href="#destinations">Browse destinations</a>
+        </p>
+      </div>
+      <aside class="hero-card" aria-label="Why Wanderlust">
+        <h3>One plan, start to finish</h3>
+        <p>Everything for your trip lives in one place — dates, times, and total price — before you commit.</p>
+        <ul>
+          <li>Clear timetables, not vague “morning / evening” labels</li>
+          <li>Total price shown up front</li>
+          <li>Free changes up to 48 hours before departure on Flexible fares</li>
+        </ul>
+      </aside>
+    </div>
+  </section>
+
+  <!-- 2 · SEARCH TRIP -->
+  <section id="search" aria-labelledby="search-title">
+    <p class="eyebrow">Step 1 — Search trip</p>
+    <h2 id="search-title">Plan your trip</h2>
+    <p class="section-sub">Tell us where you want to go and when. This planner is the start of the booking flow — it does not charge you.</p>
+    <form class="planner" style="margin-top:32px" action="#destinations" method="get">
+      <div class="planner-grid">
+        <div class="field">
+          <label for="from">From</label>
+          <input id="from" name="from" type="text" value="Toronto (YYZ)" autocomplete="off">
+        </div>
+        <div class="field">
+          <label for="to">To</label>
+          <select id="to" name="to">
+            <option>Lisbon, Portugal</option>
+            <option>Kyoto, Japan</option>
+            <option>Banff, Canada</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="dates">Dates</label>
+          <input id="dates" name="dates" type="text" value="Jun 12 – Jun 19" autocomplete="off">
+        </div>
+        <button class="btn btn-primary" type="submit">Search trips</button>
+      </div>
+      <p class="hint">Example search shown. Change the destination above, then pick a card below to continue to booking.</p>
+    </form>
+  </section>
+
+  <!-- 3 · PICK DESTINATION -->
+  <section id="destinations" aria-labelledby="dest-title">
+    <p class="eyebrow">Step 2 — Pick destination</p>
+    <h2 id="dest-title">Where to next?</h2>
+    <p class="section-sub">Three starting points. Pick one to see its timetable and fares — your choice carries into the booking step.</p>
+    <div class="cards">
+      <article class="card">
+        <div class="card-visual"><span>Most loved</span></div>
+        <div class="card-body">
+          <h3>Lisbon, Portugal</h3>
+          <p>Sunlit streets, trams, and long coastal walks. Best for a relaxed first week abroad.</p>
+          <div class="card-meta"><span>7 days<small>Jun 12 – Jun 19</small></span><span>From $849<small>per person</small></span></div>
+          <a class="btn btn-primary" href="#book">Choose Lisbon</a>
+        </div>
+      </article>
+      <article class="card">
+        <div class="card-visual"><span>Best for culture</span></div>
+        <div class="card-body">
+          <h3>Kyoto, Japan</h3>
+          <p>Temples, gardens, and quiet neighbourhoods. Best for slow days and early mornings.</p>
+          <div class="card-meta"><span>10 days<small>Jun 12 – Jun 22</small></span><span>From $1,249<small>per person</small></span></div>
+          <a class="btn btn-primary" href="#book">Choose Kyoto</a>
+        </div>
+      </article>
+      <article class="card">
+        <div class="card-visual"><span>Closest escape</span></div>
+        <div class="card-body">
+          <h3>Banff, Canada</h3>
+          <p>Mountain lakes, trails, and clear air. Best for a shorter trip without a long flight.</p>
+          <div class="card-meta"><span>4 days<small>Jun 12 – Jun 16</small></span><span>From $499<small>per person</small></span></div>
+          <a class="btn btn-primary" href="#book">Choose Banff</a>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- TIMETABLE -->
+  <section id="timetable" aria-labelledby="time-title">
+    <p class="eyebrow">Times you can plan around</p>
+    <h2 id="time-title">Sample timetable — Toronto to Lisbon</h2>
+    <p class="section-sub">Times are illustrative for planning. Final times are confirmed at booking.</p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th scope="col">Departure</th><th scope="col">Arrival</th><th scope="col">Duration</th><th scope="col">Stops</th><th scope="col">Fare</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>08:35 — YYZ</td><td>20:10 — LIS</td><td>7h 35m</td><td><span class="tag">Nonstop</span></td><td><strong>$849</strong></td></tr>
+          <tr><td>14:20 — YYZ</td><td>06:05 +1 — LIS</td><td>7h 45m</td><td><span class="tag">Nonstop</span></td><td><strong>$899</strong></td></tr>
+          <tr><td>09:50 — YYZ</td><td>23:15 — LIS</td><td>9h 25m</td><td class="muted">1 stop</td><td><strong>$749</strong></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- PRICING -->
+  <section id="pricing" aria-labelledby="price-title">
+    <p class="eyebrow">Clear pricing</p>
+    <h2 id="price-title">Pick a fare that fits</h2>
+    <p class="section-sub">The price you see is the price for that fare. Taxes are included in the totals below.</p>
+    <div class="pricing">
+      <article class="price">
+        <h3>Essential</h3>
+        <p class="amount">$749 <small>per person</small></p>
+        <p>For light packers who know their dates.</p>
+        <ul><li>Carry-on included</li><li>Standard seat</li><li>Non-refundable</li></ul>
+        <a class="btn btn-secondary" href="#book">Book Essential</a>
+      </article>
+      <article class="price featured">
+        <h3>Flexible — most popular</h3>
+        <p class="amount">$849 <small>per person</small></p>
+        <p>Room to change your mind.</p>
+        <ul><li>Carry-on + checked bag</li><li>Free changes up to 48h before</li><li>Seat selection included</li></ul>
+        <a class="btn btn-primary" href="#book">Book Flexible</a>
+      </article>
+      <article class="price">
+        <h3>Premium</h3>
+        <p class="amount">$1,099 <small>per person</small></p>
+        <p>More space, more ease.</p>
+        <ul><li>Extra legroom</li><li>Priority boarding</li><li>Flexible + refundable</li></ul>
+        <a class="btn btn-secondary" href="#book">Book Premium</a>
+      </article>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section id="faq" aria-labelledby="faq-title">
+    <p class="eyebrow">Before you book</p>
+    <h2 id="faq-title">Frequently asked questions</h2>
+    <div class="faq">
+      <details open>
+        <summary>What is included in the price?</summary>
+        <p>The fare, taxes, and the items listed under your chosen fare tier. Anything extra is shown before you pay — never added silently afterwards.</p>
+      </details>
+      <details>
+        <summary>Can I change my dates after booking?</summary>
+        <p>Yes on Flexible and Premium fares, free up to 48 hours before departure. Essential fares can be changed for a fee, subject to availability.</p>
+      </details>
+      <details>
+        <summary>Do I need to pay now?</summary>
+        <p>This page is a planning and selection flow. Payment happens only on the final booking step, after you review times, travellers, and the total.</p>
+      </details>
+      <details>
+        <summary>What if my flight time changes?</summary>
+        <p>We notify you by email and show the updated timetable in your booking. Flexible and Premium fares can be rebooked free if the change is significant.</p>
+      </details>
+    </div>
+  </section>
+
+  <!-- 4 · BOOK -->
+  <section id="book" aria-labelledby="book-title">
+    <div class="book">
+      <div>
+        <h2 id="book-title">Ready to book?</h2>
+        <p>You have landed, searched, and picked a destination. The final step is to confirm travellers, review the total, and book — starting from the destination and fare you chose above.</p>
+      </div>
+      <a class="btn btn-primary" href="#search" style="background:var(--surface);color:var(--text)">Review and book →</a>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <p><strong>Wanderlust Travel</strong> — a travel booking concept built from a single supplied spec.</p>
+    <p>Skill B Library-lookup · Website: Wanderlust Travel · Palette: bg #EEF4F7, surface #FFFFFF, text #0B2233, muted #4A6070, border #C2D3DC, primary #0E6E8C · Type: Newsreader (display) / Inter (body) · Spacing: 8px grid, radius 16px, section gap 64px.</p>
+    <p>MCP not live yet — built from the supplied spec.</p>
+  </div>
+</footer>
+
+</body>
+</html>

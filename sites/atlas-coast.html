@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Atlas Coast — Coastal Escapes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,500;6..72,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --color-bg: #FDF8F0;
+  --color-surface: #FFFFFF;
+  --color-text: #1E2A2E;
+  --color-muted: #5A6B70;
+  --color-border: #E2D9CC;
+  --color-primary: #C96F4A;
+  --color-on-primary: #101010;
+  --font-display: "Newsreader", Georgia, serif;
+  --font-body: "Inter", system-ui, sans-serif;
+  --radius: 16px;
+  --section-gap: 64px;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--color-bg);color:var(--color-text);font-family:var(--font-body);line-height:1.6}
+a{color:inherit}
+.wrap{max-width:1120px;margin:0 auto;padding:0 16px}
+header{border-bottom:1px solid var(--color-border);background:var(--color-surface)}
+.nav{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:16px 0;flex-wrap:wrap}
+.brand{font-family:var(--font-display);font-size:28px;font-weight:600;text-decoration:none}
+.navlinks{display:flex;gap:8px;flex-wrap:wrap}
+.navlinks a{display:inline-flex;align-items:center;min-height:44px;padding:8px 12px;text-decoration:none;border-radius:999px}
+.navlinks a:hover{background:var(--color-bg)}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:12px 20px;border-radius:999px;border:1px solid var(--color-border);background:var(--color-surface);color:var(--color-text);font-weight:600;cursor:pointer;text-decoration:none}
+.btn-primary{background:var(--color-primary);border-color:var(--color-primary);color:var(--color-on-primary)}
+.btn-primary:hover{filter:brightness(1.05)}
+section{padding:var(--section-gap) 0}
+h1,h2,h3{font-family:var(--font-display);line-height:1.2;margin:0 0 16px}
+h1{font-size:clamp(40px,6vw,64px)}
+h2{font-size:32px}
+p{margin:0 0 16px}
+.muted{color:var(--color-muted)}
+.hero{display:grid;gap:32px;align-items:center}
+.hero img,.card img{width:100%;height:auto;display:block;border-radius:var(--radius);aspect-ratio:16/10;object-fit:cover}
+.eyebrow{font-weight:600;letter-spacing:.08em;text-transform:uppercase;font-size:14px;color:var(--color-muted)}
+.flow{list-style:none;padding:0;margin:24px 0;display:flex;gap:8px;flex-wrap:wrap}
+.flow li{border:1px solid var(--color-border);background:var(--color-surface);border-radius:999px;padding:8px 14px}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:24px}
+.card{background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius);overflow:hidden;padding:0 0 24px}
+.card-body{padding:24px}
+.card-body h3{font-size:24px}
+.price{font-family:var(--font-display);font-size:28px;font-weight:600}
+.tiers{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.tier{background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius);padding:24px}
+details{background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius);padding:16px 20px;margin-bottom:16px}
+details summary{min-height:44px;display:flex;align-items:center;font-weight:600;cursor:pointer}
+.cta{background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius);padding:32px;text-align:center}
+.notice{border:1px solid var(--color-border);background:var(--color-surface);border-radius:var(--radius);padding:16px 20px}
+footer{border-top:1px solid var(--color-border);padding:32px 0;color:var(--color-muted)}
+@media(min-width:768px){.hero{grid-template-columns:1.1fr .9fr}}
+@media(max-width:768px){.grid,.tiers{grid-template-columns:1fr}section{padding:48px 0}}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap nav">
+    <a class="brand" href="#">Atlas Coast</a>
+    <nav class="navlinks" aria-label="Main">
+      <a href="#escapes">Escapes</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#faq">FAQ</a>
+    </nav>
+    <a class="btn btn-primary" href="#book">Book a stay</a>
+  </div>
+</header>
+
+<main>
+  <section class="wrap">
+    <div class="hero">
+      <div>
+        <p class="eyebrow">Coastal Escapes — Editorial, Minimal</p>
+        <h1>Slow days, warm sand, open sea.</h1>
+        <p class="muted">Atlas Coast is a small collection of coastal stays: quiet coves, cliff houses, and harbour towns, chosen for long mornings and unhurried evenings.</p>
+        <ol class="flow" aria-label="How it works">
+          <li>1. Land</li>
+          <li>2. Browse escapes</li>
+          <li>3. Pick a stay</li>
+          <li>4. Book</li>
+        </ol>
+        <a class="btn btn-primary" href="#escapes">Browse escapes</a>
+      </div>
+      <img src="../../atlas-coast/hero-coast.webp" alt="A quiet sandy cove between warm terracotta cliffs at golden hour, calm sea in the distance">
+    </div>
+  </section>
+
+  <section class="wrap" id="escapes">
+    <h2>Browse escapes</h2>
+    <p class="muted">Pick a stay. Your choice appears in the booking summary below.</p>
+    <div class="grid">
+      <article class="card">
+        <img src="../../atlas-coast/cliff-house.webp" alt="A small whitewashed house on a terracotta cliff above a sandy cove" loading="lazy">
+        <div class="card-body">
+          <h3>Cliff House, Sandy Cove</h3>
+          <p class="muted">A whitewashed house on the cliff, steps from a sheltered beach. Two bedrooms, a shaded terrace, and sea views from every room.</p>
+          <p class="price">From $185 / night</p>
+          <button class="btn btn-primary pick" type="button" data-stay="Cliff House, Sandy Cove — from $185 / night">Pick this stay</button>
+        </div>
+      </article>
+      <article class="card">
+        <img src="../../atlas-coast/harbour.webp" alt="Stone harbour buildings with terracotta roofs and wooden boats on calm water at sunrise" loading="lazy">
+        <div class="card-body">
+          <h3>Harbour House, Old Town</h3>
+          <p class="muted">A stone house on the harbour front, beside the morning boats. One bedroom, a kitchen for slow breakfasts, and a flat walk to town.</p>
+          <p class="price">From $145 / night</p>
+          <button class="btn btn-primary pick" type="button" data-stay="Harbour House, Old Town — from $145 / night">Pick this stay</button>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section class="wrap" id="pricing">
+    <h2>Pricing</h2>
+    <p class="muted">Simple stays, no hidden extras. Prices are per night, before local taxes.</p>
+    <div class="tiers">
+      <div class="tier"><h3>Stay</h3><p class="price">$145+</p><p class="muted">A room or small house, self-catering, flexible arrival.</p></div>
+      <div class="tier"><h3>Stay + Breakfast</h3><p class="price">$175+</p><p class="muted">Everything in Stay, plus breakfast delivered each morning.</p></div>
+      <div class="tier"><h3>Slow Week</h3><p class="price">$980+</p><p class="muted">Seven nights, late checkout, and a guided coastal walk.</p></div>
+    </div>
+  </section>
+
+  <section class="wrap" id="faq">
+    <h2>Questions</h2>
+    <details><summary>What is included in a stay?</summary><p class="muted">Linen, towels, kitchen basics, and local arrival notes. Breakfast and guided walks are in the higher tiers above.</p></details>
+    <details><summary>Can I change my dates?</summary><p class="muted">Yes, up to 14 days before arrival, subject to availability. This demo booking does not take payment.</p></details>
+    <details><summary>Are the photos real places?</summary><p class="muted">The three photos on this page are generated editorial images for this demo design, not photographs of a specific bookable property.</p></details>
+  </section>
+
+  <section class="wrap" id="book">
+    <div class="cta">
+      <h2>Book your stay</h2>
+      <p class="muted" id="summary">No stay picked yet — pick Cliff House or Harbour House above.</p>
+      <button class="btn btn-primary" id="bookBtn" type="button">Confirm booking (demo)</button>
+      <p class="muted" id="confirm" aria-live="polite"></p>
+      <p class="muted">Demo only: no payment is taken and no booking is recorded.</p>
+    </div>
+  </section>
+
+  <section class="wrap">
+    <div class="notice">
+      <p><strong>Test note.</strong> MCP not live yet — built from the supplied spec. Images are generated content photos, not UI screenshots, not a Mobbin entry, and not a real person's likeness.</p>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <p>Atlas Coast — Coastal Escapes. Spec: Websites, Web, Editorial, Minimal. Palette, typography, and spacing are frozen in the token block at the top of this file.</p>
+  </div>
+</footer>
+
+<script>
+document.querySelectorAll('.pick').forEach(function(btn){
+  btn.addEventListener('click', function(){
+    document.getElementById('summary').textContent = 'Picked: ' + btn.getAttribute('data-stay');
+    document.getElementById('confirm').textContent = '';
+  });
+});
+document.getElementById('bookBtn').addEventListener('click', function(){
+  var s = document.getElementById('summary').textContent;
+  document.getElementById('confirm').textContent = s.indexOf('Picked:') === 0
+    ? 'Demo booking confirmed for: ' + s.replace('Picked: ', '') + '. No payment taken.'
+    : 'Please pick a stay first.';
+});
+</script>
+</body>
+</html>

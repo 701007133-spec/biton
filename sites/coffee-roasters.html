@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ember &amp; Oak Coffee Roasters</title>
+<meta name="description" content="Small-batch coffee beans and a flexible subscription from Ember and Oak Coffee Roasters.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/*
+DIRECTION: A warm, craft roastery shop that feels like a quiet morning kitchen, not a generic storefront.
+PALETTE: bg, surface, text, muted, border, primary (see :root below, the only place colour values appear).
+TYPE ROLES: display = Fraunces, body = Inter, mono = none.
+LAYOUT: single column at phone width, 1120px max, 3-column product grid on desktop.
+MOTION: transform and opacity only, 200-300ms, or none.
+ONE THING TO AVOID: generic template gloss, purple gradients, glassmorphism, fake screenshots, second accent.
+*/
+:root {
+  --color-bg: #F7F1E8;
+  --color-surface: #FFFDF8;
+  --color-text: #241A12;
+  --color-muted: #6E5F52;
+  --color-border: #DDD0BE;
+  --color-primary: #9A4A1F;
+  --font-display: "Fraunces", Georgia, serif;
+  --font-body: "Inter", system-ui, sans-serif;
+  --radius: 16px;
+  --section-gap: 64px;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  line-height: 1.6;
+}
+a { color: inherit; }
+.wrap { max-width: 1120px; margin: 0 auto; padding: 0 20px; }
+button, .choice {
+  font: inherit;
+  min-height: 44px;
+  cursor: pointer;
+  border-radius: 12px;
+  transition: transform 200ms ease, opacity 200ms ease;
+}
+button:focus-visible, .choice:focus-visible { outline: 3px solid var(--color-primary); outline-offset: 2px; }
+
+/* NAV */
+.nav { border-bottom: 1px solid var(--color-border); background: var(--color-surface); }
+.nav-inner {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 16px; padding: 16px 0; flex-wrap: wrap;
+}
+.brand { font-family: var(--font-display); font-size: 24px; font-weight: 700; text-decoration: none; }
+.brand span { color: var(--color-primary); }
+.nav-links { display: flex; gap: 8px; flex-wrap: wrap; }
+.nav-links a {
+  text-decoration: none; font-weight: 600; min-height: 44px;
+  display: inline-flex; align-items: center; padding: 0 12px; border-radius: 12px;
+}
+.nav-links a:hover { background: var(--color-bg); }
+.btn {
+  border: 0; background: var(--color-primary); color: var(--color-surface);
+  font-weight: 700; padding: 0 20px; display: inline-flex; align-items: center; justify-content: center;
+}
+.btn:hover { transform: translateY(-1px); opacity: 0.94; }
+.btn-secondary {
+  background: transparent; color: var(--color-text);
+  border: 1px solid var(--color-border);
+}
+
+/* HERO */
+.hero { padding: var(--section-gap) 0; }
+.hero-grid { display: grid; grid-template-columns: 1fr; gap: 32px; align-items: center; }
+.eyebrow { color: var(--color-primary); font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; font-size: 13px; margin: 0 0 8px; }
+h1 { font-family: var(--font-display); font-size: clamp(40px, 8vw, 64px); line-height: 1.05; margin: 0 0 16px; }
+.lede { color: var(--color-muted); font-size: 18px; margin: 0 0 24px; max-width: 560px; }
+.hero-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+.hero-card {
+  background: var(--color-surface); border: 1px solid var(--color-border);
+  border-radius: var(--radius); padding: 24px;
+}
+.hero-card h2 { font-family: var(--font-display); margin: 0 0 8px; font-size: 24px; }
+.hero-card p { color: var(--color-muted); margin: 0 0 16px; }
+.facts { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 24px 0 0; padding: 0; list-style: none; }
+.facts li { border-top: 1px solid var(--color-border); padding-top: 12px; }
+.facts strong { display: block; font-family: var(--font-display); font-size: 22px; }
+.facts span { color: var(--color-muted); font-size: 14px; }
+
+/* SECTIONS / GRID */
+.section { padding: 0 0 var(--section-gap); }
+.section-head { max-width: 640px; margin-bottom: 24px; }
+.section-head h2 { font-family: var(--font-display); font-size: 32px; line-height: 1.15; margin: 0 0 8px; }
+.section-head p { color: var(--color-muted); margin: 0; }
+.grid { display: grid; grid-template-columns: 1fr; gap: 16px; }
+.card {
+  background: var(--color-surface); border: 1px solid var(--color-border);
+  border-radius: var(--radius); padding: 24px; display: flex; flex-direction: column; gap: 8px;
+}
+.bag-mark {
+  width: 56px; height: 56px; border-radius: 50%; background: var(--color-bg);
+  border: 1px solid var(--color-border); display: grid; place-items: center;
+  font-family: var(--font-display); font-weight: 700; color: var(--color-primary); font-size: 20px;
+}
+.card h3 { font-family: var(--font-display); margin: 8px 0 0; font-size: 24px; }
+.card .notes { color: var(--color-muted); margin: 0; }
+.meta { display: flex; gap: 8px; flex-wrap: wrap; margin: 8px 0; }
+.tag { border: 1px solid var(--color-border); border-radius: 999px; padding: 6px 10px; font-size: 13px; font-weight: 600; }
+.price-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: auto; padding-top: 16px; border-top: 1px solid var(--color-border); }
+.price { font-weight: 700; font-size: 18px; }
+.card .btn { width: 100%; margin-top: 8px; }
+
+/* SUBSCRIPTION PICKER */
+.picker {
+  background: var(--color-surface); border: 1px solid var(--color-border);
+  border-radius: var(--radius); padding: 24px; display: grid; gap: 24px;
+}
+.picker h3 { font-family: var(--font-display); margin: 0 0 12px; font-size: 20px; }
+.choices { display: grid; grid-template-columns: 1fr; gap: 8px; }
+.choice {
+  background: transparent; border: 1px solid var(--color-border); color: var(--color-text);
+  padding: 10px 14px; text-align: left; display: flex; justify-content: space-between; gap: 12px; align-items: center;
+}
+.choice[aria-pressed="true"] { border-color: var(--color-primary); background: var(--color-bg); font-weight: 700; }
+.choice small { color: var(--color-muted); font-weight: 400; }
+.summary {
+  border-top: 1px solid var(--color-border); padding-top: 20px;
+  display: grid; gap: 8px;
+}
+.summary p { margin: 0; color: var(--color-muted); }
+.summary .total { color: var(--color-text); font-size: 22px; font-weight: 700; }
+.confirm {
+  display: none; border: 1px solid var(--color-border); border-radius: 12px;
+  padding: 16px; background: var(--color-bg);
+}
+.confirm.visible { display: block; }
+.confirm p { margin: 0 0 8px; }
+.note { color: var(--color-muted); font-size: 14px; }
+
+/* FOOTER */
+.footer { border-top: 1px solid var(--color-border); padding: 32px 0 40px; }
+.footer-grid { display: grid; grid-template-columns: 1fr; gap: 16px; }
+.footer p { color: var(--color-muted); margin: 0; }
+.footer strong { color: var(--color-text); }
+
+@media (min-width: 640px) {
+  .grid { grid-template-columns: 1fr 1fr; }
+  .choices { grid-template-columns: 1fr 1fr; }
+  .footer-grid { grid-template-columns: 1.5fr 1fr; }
+}
+@media (min-width: 900px) {
+  .hero-grid { grid-template-columns: 1.2fr 0.8fr; }
+  .grid { grid-template-columns: 1fr 1fr 1fr; }
+  .picker { grid-template-columns: 1fr 1fr; }
+  .picker .summary-col { border-left: 1px solid var(--color-border); padding-left: 24px; }
+}
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="wrap nav-inner">
+    <a class="brand" href="#">Ember <span>&amp;</span> Oak</a>
+    <nav class="nav-links" aria-label="Main">
+      <a href="#beans">Beans</a>
+      <a href="#subscribe">Subscribe</a>
+      <a href="#checkout">Checkout</a>
+    </nav>
+    <a class="btn" href="#subscribe" style="text-decoration:none; min-height:44px;">Start a subscription</a>
+  </div>
+</header>
+
+<main>
+  <!-- HERO: Land -->
+  <section class="hero">
+    <div class="wrap hero-grid">
+      <div>
+        <p class="eyebrow">Small-batch roasters</p>
+        <h1>Good coffee, roasted slowly, delivered fresh.</h1>
+        <p class="lede">Ember &amp; Oak roasts in small weekly batches, so the bag that arrives is never stale stock. Pick a bean, choose how often it comes, and change it any time.</p>
+        <div class="hero-actions">
+          <a class="btn" href="#beans" style="text-decoration:none; min-height:44px;">Browse the beans</a>
+          <a class="btn btn-secondary" href="#subscribe" style="text-decoration:none; min-height:44px;">Build my subscription</a>
+        </div>
+        <ul class="facts">
+          <li><strong>Weekly</strong><span>small-batch roasts</span></li>
+          <li><strong>48 hrs</strong><span>roast to dispatch, typical</span></li>
+        </ul>
+      </div>
+      <div class="hero-card">
+        <h2>This week's roast</h2>
+        <p><strong style="color:var(--color-text);">Highland Ember</strong> — dark chocolate, toasted hazelnut, a low, steady finish. Roasted for filter and French press.</p>
+        <a class="btn" href="#subscribe" style="text-decoration:none; min-height:44px;">Subscribe from $22</a>
+        <p class="note" style="margin-top:12px;">Pause or cancel any time. No lock-in, no hidden fees.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRODUCT GRID: Browse beans -->
+  <section class="section" id="beans">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>Browse the beans</h2>
+        <p>Four current roasts. Every bag lists its tasting notes and roast level plainly, so you know what you are buying before you subscribe.</p>
+      </div>
+      <div class="grid">
+        <article class="card">
+          <div class="bag-mark" aria-hidden="true">HE</div>
+          <h3>Highland Ember</h3>
+          <p class="notes">Dark chocolate, toasted hazelnut, molasses.</p>
+          <div class="meta"><span class="tag">Medium-dark</span><span class="tag">Filter / Press</span></div>
+          <div class="price-row"><span class="price">$22 / 250g</span><span class="note">Bestseller</span></div>
+          <button type="button" class="btn" data-pick-bean="Highland Ember" data-pick-price="22">Choose Highland Ember</button>
+        </article>
+        <article class="card">
+          <div class="bag-mark" aria-hidden="true">OM</div>
+          <h3>Orchard Morning</h3>
+          <p class="notes">Red apple, honey, soft citrus.</p>
+          <div class="meta"><span class="tag">Light</span><span class="tag">Filter / Pour-over</span></div>
+          <div class="price-row"><span class="price">$24 / 250g</span><span class="note">Bright &amp; clean</span></div>
+          <button type="button" class="btn" data-pick-bean="Orchard Morning" data-pick-price="24">Choose Orchard Morning</button>
+        </article>
+        <article class="card">
+          <div class="bag-mark" aria-hidden="true">ON</div>
+          <h3>Oak &amp; Night</h3>
+          <p class="notes">Cocoa, oak smoke, black cherry.</p>
+          <div class="meta"><span class="tag">Dark</span><span class="tag">Espresso / Moka pot</span></div>
+          <div class="price-row"><span class="price">$23 / 250g</span><span class="note">Bold</span></div>
+          <button type="button" class="btn" data-pick-bean="Oak &amp; Night" data-pick-price="23">Choose Oak &amp; Night</button>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- SUBSCRIPTION PICKER: Pick subscription, then Checkout -->
+  <section class="section" id="subscribe">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>Pick your subscription</h2>
+        <p>Choose a bean, a bag size, and how often it arrives. The price updates as you choose. Checkout below confirms your selection on this page.</p>
+      </div>
+      <div class="picker">
+        <div>
+          <h3>1. Bean</h3>
+          <div class="choices" role="group" aria-label="Choose a bean">
+            <button type="button" class="choice" data-bean="Highland Ember" data-price="22" aria-pressed="true">Highland Ember <small>$22 / 250g</small></button>
+            <button type="button" class="choice" data-bean="Orchard Morning" data-price="24" aria-pressed="false">Orchard Morning <small>$24 / 250g</small></button>
+            <button type="button" class="choice" data-bean="Oak &amp; Night" data-price="23" aria-pressed="false">Oak &amp; Night <small>$23 / 250g</small></button>
+          </div>
+          <h3 style="margin-top:24px;">2. Bag size</h3>
+          <div class="choices" role="group" aria-label="Choose a bag size">
+            <button type="button" class="choice" data-size="250g" data-mult="1" aria-pressed="true">250g <small>Base price</small></button>
+            <button type="button" class="choice" data-size="500g" data-mult="1.8" aria-pressed="false">500g <small>Save vs two small bags</small></button>
+            <button type="button" class="choice" data-size="1kg" data-mult="3.4" aria-pressed="false">1kg <small>Best value</small></button>
+          </div>
+          <h3 style="margin-top:24px;">3. How often?</h3>
+          <div class="choices" role="group" aria-label="Choose delivery frequency">
+            <button type="button" class="choice" data-freq="Every week" data-discount="0" aria-pressed="true">Every week <small>Full price</small></button>
+            <button type="button" class="choice" data-freq="Every 2 weeks" data-discount="0.05" aria-pressed="false">Every 2 weeks <small>Save 5%</small></button>
+            <button type="button" class="choice" data-freq="Every month" data-discount="0.10" aria-pressed="false">Every month <small>Save 10%</small></button>
+          </div>
+        </div>
+        <div class="summary-col" id="checkout">
+          <div class="summary" aria-live="polite">
+            <h3>Your subscription</h3>
+            <p id="summary-line">Highland Ember, 250g, every week.</p>
+            <p class="total" id="summary-total">Total per delivery: $22.00</p>
+            <p class="note">Prices shown per delivery, before any delivery fee at real checkout. This page is a standalone demo: pressing checkout confirms your selection here and does not charge a card or place a real order.</p>
+            <button type="button" class="btn" id="checkout-btn">Checkout — confirm this subscription</button>
+          </div>
+          <div class="confirm" id="confirm-box">
+            <p><strong>Selection confirmed.</strong></p>
+            <p id="confirm-line"></p>
+            <p class="note">No payment was taken. In a live shop, this step would hand your confirmed selection to secure checkout.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="wrap footer-grid">
+    <div>
+      <p><strong>Ember &amp; Oak Coffee Roasters</strong></p>
+      <p>Small-batch coffee, roasted weekly. Pause or cancel any time.</p>
+    </div>
+    <div>
+      <p>Built with skill A BITON Frontend Skill, for website Ember &amp; Oak Coffee Roasters. Palette: bg F7F1E8, surface FFFDF8, text 241A12, muted 6E5F52, border DDD0BE, primary 9A4A1F. MCP not live yet — built from the supplied spec.</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var state = { bean: "Highland Ember", price: 22, size: "250g", mult: 1, freq: "Every week", discount: 0 };
+  var summaryLine = document.getElementById("summary-line");
+  var summaryTotal = document.getElementById("summary-total");
+  function money(n) { return "$" + n.toFixed(2); }
+  function render() {
+    var total = state.price * state.mult * (1 - state.discount);
+    summaryLine.textContent = state.bean + ", " + state.size + ", " + state.freq.toLowerCase() + ".";
+    summaryTotal.textContent = "Total per delivery: " + money(total);
+  }
+  function bind(selector, key, numKey, extra) {
+    var btns = document.querySelectorAll(selector);
+    btns.forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        btns.forEach(function (b) { b.setAttribute("aria-pressed", "false"); });
+        btn.setAttribute("aria-pressed", "true");
+        state[key] = btn.getAttribute(extra);
+        state[numKey] = parseFloat(btn.getAttribute("data-" + (key === "bean" ? "price" : key === "size" ? "mult" : "discount")));
+        if (key === "bean") { state.price = parseFloat(btn.getAttribute("data-price")); }
+        render();
+      });
+    });
+  }
+  bind("[data-bean]", "bean", "price", "data-bean");
+  bind("[data-size]", "size", "mult", "data-size");
+  bind("[data-freq]", "freq", "discount", "data-freq");
+  document.querySelectorAll("[data-pick-bean]").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var name = btn.getAttribute("data-pick-bean");
+      var target = document.querySelector('[data-bean="' + name + '"]');
+      if (target) { target.click(); }
+      document.getElementById("subscribe").scrollIntoView({ behavior: "smooth" });
+    });
+  });
+  document.getElementById("checkout-btn").addEventListener("click", function () {
+    var box = document.getElementById("confirm-box");
+    document.getElementById("confirm-line").textContent = summaryLine.textContent + " " + summaryTotal.textContent;
+    box.classList.add("visible");
+    box.scrollIntoView({ behavior: "smooth", block: "center" });
+  });
+  render();
+})();
+</script>
+</body>
+</html>

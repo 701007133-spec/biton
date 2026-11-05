@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pulse Fitness — Fitness App Landing</title>
+<!--
+DIRECTION: A calm, focused fitness-app landing page that helps a visitor land, pick a plan, start a trial, and track a workout, with no clutter.
+PALETTE: background, surface, text, muted, border, primary — frozen in the :root block below, no other colours used.
+TYPE ROLES: display = Archivo, body = Inter, mono = none (not in spec, not used).
+LAYOUT: single column on phone, two columns for plans on tablet, three columns for plans/pricing on desktop, 1120px max width.
+MOTION: transform/opacity only, 200ms, on hover/focus and on the workout tracker reveal.
+ONE THING TO AVOID: generic gym hype, fake screenshots, and any second accent colour.
+FLOW: Land -> Pick plan -> Start trial -> Track workout.
+NOTE: All interactions on this page are in-page only. Picking a plan updates the trial button and tracker; starting a trial reveals the workout tracker below. No account is created and no workout data leaves this page.
+-->
+<style>
+:root{
+  --color-bg:#F2F7F2;
+  --color-surface:#FFFFFF;
+  --color-text:#0E241A;
+  --color-muted:#4A5D52;
+  --color-border:#C8D8CE;
+  --color-primary:#1F7A4D;
+  --space-1:8px;
+  --space-2:16px;
+  --space-3:24px;
+  --space-4:32px;
+  --space-8:64px;
+  --radius:16px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--color-bg);color:var(--color-text);font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;font-size:17px;line-height:1.6}
+h1,h2,h3{font-family:Archivo,Inter,system-ui,sans-serif;line-height:1.15;margin:0 0 var(--space-2)}
+p{margin:0 0 var(--space-2);color:var(--color-muted)}
+a{color:var(--color-primary)}
+.wrap{max-width:1120px;margin:0 auto;padding:0 var(--space-2)}
+section{padding:var(--space-8) 0}
+button,.btn{min-height:44px;display:inline-flex;align-items:center;justify-content:center;gap:var(--space-1);padding:12px var(--space-3);border-radius:var(--radius);border:1px solid var(--color-border);background:var(--color-surface);color:var(--color-text);font:inherit;font-weight:700;cursor:pointer;text-decoration:none;transition:transform 200ms,opacity 200ms}
+button:hover,.btn:hover{transform:translateY(-1px)}
+.btn-primary{background:var(--color-primary);border-color:var(--color-primary);color:var(--color-surface)}
+.btn-primary:focus-visible,button:focus-visible,.btn:focus-visible{outline:3px solid var(--color-text);outline-offset:3px}
+.eyebrow{font-size:14px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--color-primary);margin-bottom:var(--space-2)}
+/* Nav */
+nav{background:var(--color-surface);border-bottom:1px solid var(--color-border)}
+.nav-inner{display:flex;align-items:center;justify-content:space-between;gap:var(--space-2);padding-top:var(--space-2);padding-bottom:var(--space-2);flex-wrap:wrap}
+.brand{font-family:Archivo,Inter,sans-serif;font-size:24px;font-weight:800;color:var(--color-text);text-decoration:none}
+.nav-links{display:flex;gap:var(--space-1);flex-wrap:wrap}
+.nav-links a{min-height:44px;display:inline-flex;align-items:center;padding:8px 12px;color:var(--color-text);text-decoration:none;font-weight:600}
+/* Hero */
+.hero h1{font-size:40px}
+.hero-grid{display:grid;gap:var(--space-4)}
+.hero-card{background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius);padding:var(--space-3)}
+.hero-card strong{font-size:32px;font-family:Archivo,Inter,sans-serif}
+.stat-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:var(--space-2);margin-top:var(--space-3)}
+.stat{border-top:1px solid var(--color-border);padding-top:var(--space-2)}
+.stat b{display:block;font-size:20px}
+.stat span{color:var(--color-muted);font-size:15px}
+/* Cards / grids */
+.grid{display:grid;gap:var(--space-3)}
+.card{background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius);padding:var(--space-3)}
+.card.selected{border:2px solid var(--color-primary)}
+.card ul{margin:var(--space-2) 0;padding-left:20px;color:var(--color-muted)}
+.card li{margin-bottom:var(--space-1)}
+.price{font-family:Archivo,Inter,sans-serif;font-size:36px;font-weight:800;margin:var(--space-2) 0 0}
+.price span{font-size:16px;color:var(--color-muted);font-weight:400}
+.tag{display:inline-block;background:var(--color-bg);border:1px solid var(--color-border);border-radius:999px;padding:6px 12px;font-size:14px;font-weight:700;margin-bottom:var(--space-2)}
+blockquote{margin:0}
+blockquote p{color:var(--color-text);font-size:19px}
+cite{color:var(--color-muted);font-style:normal}
+/* Tracker */
+#tracker{display:none;background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius);padding:var(--space-3);margin-top:var(--space-3)}
+#tracker.open{display:block}
+.check-row{display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid var(--color-border);min-height:44px}
+.check-row:last-child{border-bottom:0}
+.check-row input{width:24px;height:24px;accent-color:var(--color-primary);flex-shrink:0;margin-top:2px}
+.check-row.done label{text-decoration:line-through;color:var(--color-muted)}
+#trial-status{font-weight:700;color:var(--color-primary)}
+/* CTA + footer */
+.cta{background:var(--color-text);color:var(--color-surface);border-radius:var(--radius);padding:var(--space-4)}
+.cta h2{color:var(--color-surface)}
+.cta p{color:var(--color-surface)}
+footer{border-top:1px solid var(--color-border);padding:var(--space-4) 0 var(--space-8);color:var(--color-muted)}
+footer p{font-size:15px}
+@media(min-width:720px){
+  .hero h1{font-size:56px}
+  .grid.two{grid-template-columns:1fr 1fr}
+  .hero-grid{grid-template-columns:1.2fr .8fr;align-items:start}
+}
+@media(min-width:1024px){
+  .grid.three{grid-template-columns:1fr 1fr 1fr}
+  .wrap{padding:0 var(--space-4)}
+}
+</style>
+</head>
+<body>
+<nav aria-label="Main navigation">
+  <div class="wrap nav-inner">
+    <a class="brand" href="#top">Pulse Fitness</a>
+    <div class="nav-links">
+      <a href="#plans">Workout plans</a>
+      <a href="#pricing">Pricing</a>
+    </div>
+    <a class="btn btn-primary" href="#pricing">Start free trial</a>
+  </div>
+</nav>
+
+<main id="top">
+  <!-- HERO: Land -->
+  <section class="hero" aria-labelledby="hero-title">
+    <div class="wrap hero-grid">
+      <div>
+        <p class="eyebrow">Train steady. Track honestly.</p>
+        <h1 id="hero-title">Fitness that fits your week, not the other way round.</h1>
+        <p>Pick a plan, start a free trial, and track each workout in one calm place — strength, cardio, and mobility, without the noise.</p>
+        <p>
+          <a class="btn btn-primary" href="#plans">Pick your plan</a>
+          <a class="btn" href="#pricing">See pricing</a>
+        </p>
+        <p id="trial-status" aria-live="polite"></p>
+      </div>
+      <div class="hero-card" aria-label="At a glance">
+        <strong>3 plans</strong>
+        <p>Beginner, balanced, and strength-focused. Every plan lists exactly what a week includes before you commit.</p>
+        <div class="stat-row">
+          <div class="stat"><b>4×</b><span>workouts a week, max</span></div>
+          <div class="stat"><b>30 min</b><span>typical session</span></div>
+          <div class="stat"><b>7 days</b><span>free trial</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WORKOUT PLANS: Pick plan -->
+  <section id="plans" aria-labelledby="plans-title">
+    <div class="wrap">
+      <p class="eyebrow">Step 1 — Pick a plan</p>
+      <h2 id="plans-title">Workout plans</h2>
+      <p>Choose one. Your choice updates the trial button and the workout tracker below, so you can see exactly what you would track.</p>
+      <div class="grid three" role="group" aria-label="Workout plans">
+        <article class="card" id="plan-starter">
+          <span class="tag">Starter</span>
+          <h3>Start Moving</h3>
+          <p>For getting back into a routine. Low impact, clear instructions, no equipment needed.</p>
+          <ul><li>3 sessions a week</li><li>Bodyweight + walking</li><li>Guided warm-ups</li></ul>
+          <button type="button" data-plan="Start Moving">Select Start Moving</button>
+        </article>
+        <article class="card" id="plan-balanced">
+          <span class="tag">Most popular</span>
+          <h3>Balanced Week</h3>
+          <p>Strength, cardio, and mobility in one week, with rest days built in.</p>
+          <ul><li>4 sessions a week</li><li>Strength + cardio + mobility</li><li>Progress check-ins</li></ul>
+          <button type="button" data-plan="Balanced Week">Select Balanced Week</button>
+        </article>
+        <article class="card" id="plan-strength">
+          <span class="tag">Advanced</span>
+          <h3>Build Strength</h3>
+          <p>Progressive strength training for people who already train regularly.</p>
+          <ul><li>4 sessions a week</li><li>Progressive overload plan</li><li>Form cues for main lifts</li></ul>
+          <button type="button" data-plan="Build Strength">Select Build Strength</button>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRICING: Start trial -->
+  <section id="pricing" aria-labelledby="pricing-title">
+    <div class="wrap">
+      <p class="eyebrow">Step 2 — Start trial</p>
+      <h2 id="pricing-title">Pricing tiers</h2>
+      <p>Every tier starts with a 7-day free trial. No payment details are collected on this page.</p>
+      <div class="grid three">
+        <article class="card">
+          <h3>Basic</h3>
+          <p class="price">$0<span> / month after trial</span></p>
+          <ul><li>Starter plan only</li><li>Workout tracker</li><li>Weekly reminder</li></ul>
+          <button type="button" class="trial-btn" data-tier="Basic">Start trial — Basic</button>
+        </article>
+        <article class="card selected">
+          <h3>Plus</h3>
+          <p class="price">$9<span> / month after trial</span></p>
+          <ul><li>All three workout plans</li><li>Workout tracker + history</li><li>Progress check-ins</li></ul>
+          <button type="button" class="btn-primary trial-btn" data-tier="Plus">Start trial — Plus</button>
+        </article>
+        <article class="card">
+          <h3>Pro</h3>
+          <p class="price">$19<span> / month after trial</span></p>
+          <ul><li>Everything in Plus</li><li>Personalised weekly adjustments</li><li>Priority support</li></ul>
+          <button type="button" class="trial-btn" data-tier="Pro">Start trial — Pro</button>
+        </article>
+      </div>
+
+      <!-- TRACK WORKOUT: revealed by Start trial, in-page only -->
+      <div id="tracker" aria-live="polite">
+        <h3>Track your workout</h3>
+        <p id="tracker-plan">Pick a plan above, then tick off each part as you finish it. This tracker stays on this page.</p>
+        <div class="check-row"><input type="checkbox" id="w1"><label for="w1">Warm-up — 5 minutes, easy movement</label></div>
+        <div class="check-row"><input type="checkbox" id="w2"><label for="w2">Main workout — follow your selected plan</label></div>
+        <div class="check-row"><input type="checkbox" id="w3"><label for="w3">Cool-down and stretch — 5 minutes</label></div>
+        <p id="tracker-progress">0 of 3 parts complete.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section aria-labelledby="cta-title">
+    <div class="wrap">
+      <div class="cta">
+        <h2 id="cta-title">Start with one workout this week.</h2>
+        <p>Pick a plan, start your 7-day trial, and track that first session below — right here, with no sign-up form on this page.</p>
+        <p><a class="btn btn-primary" href="#plans">Pick your plan</a></p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <p><strong>Pulse Fitness</strong> — built with skill A: BITON Frontend Skill, from the supplied Pulse Fitness spec. Palette: background, surface, text, muted, border, primary — frozen in the :root block at the top of this file. MCP not live yet — built from the supplied spec.</p>
+    <p>No account, payment, or workout data is collected by this page.</p>
+  </div>
+</footer>
+
+<script>
+let selectedPlan = 'Balanced Week';
+const status = document.getElementById('trial-status');
+const tracker = document.getElementById('tracker');
+const trackerPlan = document.getElementById('tracker-plan');
+const progress = document.getElementById('tracker-progress');
+document.querySelectorAll('[data-plan]').forEach(function(btn){
+  btn.addEventListener('click', function(){
+    selectedPlan = btn.getAttribute('data-plan');
+    document.querySelectorAll('[data-plan]').forEach(function(b){ b.closest('.card').classList.remove('selected'); });
+    btn.closest('.card').classList.add('selected');
+    status.textContent = 'Selected plan: ' + selectedPlan + '. Now start a trial below to open your tracker.';
+    trackerPlan.textContent = 'Tracking: ' + selectedPlan + '. Tick off each part as you finish it. This tracker stays on this page.';
+    document.getElementById('plans').scrollIntoView({behavior:'smooth'});
+  });
+});
+document.querySelectorAll('.trial-btn').forEach(function(btn){
+  btn.addEventListener('click', function(){
+    tracker.classList.add('open');
+    status.textContent = 'Trial started (in-page demo): ' + btn.getAttribute('data-tier') + ' tier, ' + selectedPlan + ' plan. Your tracker is open below.';
+    trackerPlan.textContent = 'Tracking: ' + selectedPlan + ' (' + btn.getAttribute('data-tier') + ' trial). Tick off each part as you finish it.';
+    tracker.scrollIntoView({behavior:'smooth'});
+  });
+});
+function updateProgress(){
+  const boxes = tracker.querySelectorAll('input[type="checkbox"]');
+  let done = 0;
+  boxes.forEach(function(box){
+    box.closest('.check-row').classList.toggle('done', box.checked);
+    if(box.checked) done++;
+  });
+  progress.textContent = done + ' of ' + boxes.length + ' parts complete.';
+}
+tracker.querySelectorAll('input[type="checkbox"]').forEach(function(box){ box.addEventListener('change', updateProgress); });
+</script>
+</body>
+</html>

@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Neon Nights Music Festival</title>
+<meta name="description" content="Neon Nights Music Festival — three nights of music. See the lineup, pick your day, and buy your ticket.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #14101E;
+    --surface: #1E1930;
+    --text: #F5F1FF;
+    --muted: #B8B0CC;
+    --border: #3A3352;
+    --primary: #F2C14E;
+    --on-primary: #14101E;
+    --radius: 16px;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: Inter, system-ui, sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+  a { color: inherit; }
+  .wrap { width: 100%; max-width: 1080px; margin: 0 auto; padding-left: 24px; padding-right: 24px; }
+  section { padding-top: 64px; padding-bottom: 64px; }
+  h1, h2, h3 { font-family: "Space Grotesk", Inter, sans-serif; line-height: 1.15; margin-top: 0; }
+  h1 { font-size: 56px; letter-spacing: -0.02em; margin-bottom: 16px; }
+  h2 { font-size: 36px; margin-bottom: 16px; }
+  h3 { font-size: 22px; margin-bottom: 8px; }
+  p { margin-top: 0; margin-bottom: 16px; }
+  .muted { color: var(--muted); }
+  .eyebrow { color: var(--primary); font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; font-size: 14px; margin-bottom: 16px; }
+  .gold { color: var(--primary); }
+
+  /* Nav */
+  .nav { position: sticky; top: 0; background: var(--bg); border-bottom: 1px solid var(--border); z-index: 10; }
+  .nav-inner { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 72px; }
+  .logo { font-family: "Space Grotesk", sans-serif; font-weight: 700; font-size: 20px; letter-spacing: 0.04em; text-decoration: none; display: inline-flex; align-items: center; min-height: 44px; }
+  .logo-dot { display: inline-block; width: 12px; height: 12px; border-radius: 50%; background: var(--primary); margin-right: 8px; }
+  .nav-links { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .nav-links a { text-decoration: none; font-weight: 600; display: inline-flex; align-items: center; min-height: 44px; padding: 8px 16px; border-radius: var(--radius); }
+  .nav-links a:hover { background: var(--surface); }
+
+  /* Buttons — all touch targets at least 44px tall */
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    min-height: 48px; padding: 12px 24px; border-radius: var(--radius);
+    font-weight: 700; font-size: 16px; text-decoration: none; cursor: pointer;
+    border: 1px solid transparent;
+  }
+  .btn-primary { background: var(--primary); color: var(--on-primary); border-color: var(--primary); }
+  .btn-outline { background: transparent; color: var(--text); border-color: var(--border); }
+  .btn-outline:hover { background: var(--surface); }
+  .btn-day { background: transparent; color: var(--muted); border-color: var(--border); min-height: 44px; }
+  .btn-day[aria-pressed="true"] { background: var(--primary); color: var(--on-primary); border-color: var(--primary); }
+
+  /* Hero */
+  .hero { padding-top: 64px; padding-bottom: 64px; }
+  .hero-grid { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 32px; align-items: start; }
+  .hero-actions { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 24px; }
+  .hero-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; }
+  .hero-card p { color: var(--muted); }
+  .stat-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-top: 32px; }
+  .stat { border-top: 1px solid var(--border); padding-top: 16px; }
+  .stat strong { font-family: "Space Grotesk", sans-serif; font-size: 28px; display: block; }
+  .stat span { color: var(--muted); font-size: 14px; }
+
+  /* Cards and grids */
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 24px; margin-top: 32px; }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 32px; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; }
+  .card p { color: var(--muted); }
+  .tag { display: inline-flex; align-items: center; min-height: 32px; padding: 4px 12px; border: 1px solid var(--border); border-radius: 999px; font-size: 14px; color: var(--muted); }
+  .price { font-family: "Space Grotesk", sans-serif; font-size: 36px; font-weight: 700; margin: 8px 0; }
+  .price span { font-family: Inter, sans-serif; font-size: 16px; color: var(--muted); font-weight: 400; }
+  .featured { border-color: var(--primary); }
+  .card ul { margin: 0 0 24px 0; padding-left: 24px; color: var(--muted); }
+  .card li { margin-bottom: 8px; }
+
+  /* Schedule */
+  .day-picker { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 24px; margin-bottom: 24px; }
+  .show { display: flex; justify-content: space-between; gap: 16px; padding: 16px 0; border-bottom: 1px solid var(--border); }
+  .show:last-child { border-bottom: none; }
+  .show time { color: var(--primary); font-weight: 700; white-space: nowrap; }
+  .show p { color: var(--muted); margin-bottom: 0; }
+
+  /* FAQ */
+  details { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 24px; margin-bottom: 16px; }
+  summary { font-weight: 700; cursor: pointer; min-height: 44px; display: flex; align-items: center; }
+  details p { color: var(--muted); margin-bottom: 0; margin-top: 8px; }
+
+  /* Footer */
+  footer { border-top: 1px solid var(--border); padding-top: 32px; padding-bottom: 32px; color: var(--muted); font-size: 14px; line-height: 1.6; }
+  footer strong { color: var(--text); }
+
+  /* Responsive: single column at phone width, no horizontal overflow */
+  @media (max-width: 640px) {
+    h1 { font-size: 40px; }
+    h2 { font-size: 28px; }
+    section { padding-top: 64px; padding-bottom: 64px; }
+    .nav-inner { flex-direction: column; align-items: flex-start; padding-top: 8px; padding-bottom: 8px; }
+    .nav-links { width: 100%; }
+    .nav-links a { padding-left: 8px; padding-right: 8px; }
+    .hero-grid, .grid-3, .grid-2, .stat-row { grid-template-columns: 1fr; }
+    .hero-actions { flex-direction: column; }
+    .hero-actions .btn { width: 100%; }
+    .show { flex-direction: column; gap: 8px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="wrap nav-inner">
+    <a class="logo" href="#top"><span class="logo-dot" aria-hidden="true"></span>NEON NIGHTS</a>
+    <nav class="nav-links" aria-label="Main">
+      <a href="#lineup">Lineup</a>
+      <a href="#schedule">Schedule</a>
+      <a href="#tickets">Tickets</a>
+      <a href="#faq">FAQ</a>
+      <a class="btn btn-primary" href="#tickets">Buy tickets</a>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+  <!-- HERO: Land -->
+  <section class="hero">
+    <div class="wrap">
+      <div class="hero-grid">
+        <div>
+          <p class="eyebrow">Three nights &middot; One city &middot; August 14&ndash;16</p>
+          <h1>Neon Nights <span class="gold">Music Festival</span></h1>
+          <p class="muted">Three nights of electronic, indie, and hip-hop under the lights. See who is playing, pick your day, and get your ticket before it sells out.</p>
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="#lineup">See the lineup</a>
+            <a class="btn btn-outline" href="#schedule">Pick your day</a>
+          </div>
+          <div class="stat-row">
+            <div class="stat"><strong>24</strong><span>Artists</span></div>
+            <div class="stat"><strong>3</strong><span>Days</span></div>
+            <div class="stat"><strong>2</strong><span>Stages</span></div>
+          </div>
+        </div>
+        <aside class="hero-card" aria-label="Festival details">
+          <h2 style="font-size: 24px;">The essentials</h2>
+          <p><strong style="color: var(--text);">When:</strong> Friday August 14 to Sunday August 16. Gates open at 4:00 p.m. daily.</p>
+          <p><strong style="color: var(--text);">Where:</strong> Riverside Park, main stage and neon stage.</p>
+          <p><strong style="color: var(--text);">Good to know:</strong> All ages. Rain or shine. Food, water stations, and accessible viewing on site.</p>
+          <a class="btn btn-primary" href="#tickets" style="width: 100%;">Buy tickets</a>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <!-- LINEUP: See lineup -->
+  <section id="lineup">
+    <div class="wrap">
+      <p class="eyebrow">Step 1 &mdash; See lineup</p>
+      <h2>Who is playing</h2>
+      <p class="muted">Headliners each night, plus rising acts across two stages. Pick a day below to see the full running order.</p>
+      <div class="grid-3">
+        <article class="card">
+          <span class="tag">Friday headliner</span>
+          <h3 style="margin-top: 16px;">Aurora Drive</h3>
+          <p>Melodic electronic to open the weekend. Main stage, 9:30 p.m.</p>
+          <a class="btn btn-outline" href="#schedule" data-day="day1">See Friday</a>
+        </article>
+        <article class="card">
+          <span class="tag">Saturday headliner</span>
+          <h3 style="margin-top: 16px;">The Midnight Relay</h3>
+          <p>Indie rock with a late-night set built for a festival crowd. Main stage, 9:30 p.m.</p>
+          <a class="btn btn-outline" href="#schedule" data-day="day2">See Saturday</a>
+        </article>
+        <article class="card">
+          <span class="tag">Sunday headliner</span>
+          <h3 style="margin-top: 16px;">Kasia Bloom</h3>
+          <p>A closing-night set to end the weekend on a high. Main stage, 9:00 p.m.</p>
+          <a class="btn btn-outline" href="#schedule" data-day="day3">See Sunday</a>
+        </article>
+        <article class="card">
+          <h3>Neon stage picks</h3>
+          <p>DJ Marlowe, Paper Planets, June Harbor, and six more across the weekend.</p>
+        </article>
+        <article class="card">
+          <h3>Main stage picks</h3>
+          <p>Wild Static, The Ferns, Atlas Grey, and six more across the weekend.</p>
+        </article>
+        <article class="card">
+          <h3>Local openers</h3>
+          <p>Each day opens with a local act at 4:30 p.m. on the neon stage.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- SCHEDULE: Pick day -->
+  <section id="schedule">
+    <div class="wrap">
+      <p class="eyebrow">Step 2 &mdash; Pick day</p>
+      <h2>Schedule</h2>
+      <p class="muted">Choose a day to see that day's running order. Times are the planned set times.</p>
+      <div class="day-picker" role="group" aria-label="Pick a day">
+        <button class="btn btn-day" type="button" aria-pressed="true" data-target="day1">Friday, Aug 14</button>
+        <button class="btn btn-day" type="button" aria-pressed="false" data-target="day2">Saturday, Aug 15</button>
+        <button class="btn btn-day" type="button" aria-pressed="false" data-target="day3">Sunday, Aug 16</button>
+      </div>
+      <div class="card" id="day1">
+        <h3>Friday, August 14</h3>
+        <div class="show"><div><strong>Aurora Drive</strong><p>Main stage &middot; Headliner</p></div><time>9:30 p.m.</time></div>
+        <div class="show"><div><strong>Wild Static</strong><p>Main stage</p></div><time>7:45 p.m.</time></div>
+        <div class="show"><div><strong>DJ Marlowe</strong><p>Neon stage</p></div><time>6:30 p.m.</time></div>
+        <div class="show"><div><strong>Local opener</strong><p>Neon stage</p></div><time>4:30 p.m.</time></div>
+      </div>
+      <div class="card" id="day2" hidden>
+        <h3>Saturday, August 15</h3>
+        <div class="show"><div><strong>The Midnight Relay</strong><p>Main stage &middot; Headliner</p></div><time>9:30 p.m.</time></div>
+        <div class="show"><div><strong>Atlas Grey</strong><p>Main stage</p></div><time>7:45 p.m.</time></div>
+        <div class="show"><div><strong>Paper Planets</strong><p>Neon stage</p></div><time>6:30 p.m.</time></div>
+        <div class="show"><div><strong>Local opener</strong><p>Neon stage</p></div><time>4:30 p.m.</time></div>
+      </div>
+      <div class="card" id="day3" hidden>
+        <h3>Sunday, August 16</h3>
+        <div class="show"><div><strong>Kasia Bloom</strong><p>Main stage &middot; Headliner</p></div><time>9:00 p.m.</time></div>
+        <div class="show"><div><strong>The Ferns</strong><p>Main stage</p></div><time>7:30 p.m.</time></div>
+        <div class="show"><div><strong>June Harbor</strong><p>Neon stage</p></div><time>6:00 p.m.</time></div>
+        <div class="show"><div><strong>Local opener</strong><p>Neon stage</p></div><time>4:30 p.m.</time></div>
+      </div>
+      <p style="margin-top: 24px;"><a class="btn btn-primary" href="#tickets">Buy a ticket for this day</a></p>
+    </div>
+  </section>
+
+  <!-- TICKETS: Buy ticket -->
+  <section id="tickets">
+    <div class="wrap">
+      <p class="eyebrow">Step 3 &mdash; Buy ticket</p>
+      <h2>Tickets</h2>
+      <p class="muted">One day or all three. Every ticket includes both stages. Prices shown before fees.</p>
+      <div class="grid-3">
+        <article class="card">
+          <h3>Single day</h3>
+          <p class="price">$89 <span>per day</span></p>
+          <ul>
+            <li>One day of your choice</li>
+            <li>Both stages</li>
+            <li>General admission</li>
+          </ul>
+          <a class="btn btn-outline" href="#faq" style="width: 100%;">Buy single day</a>
+        </article>
+        <article class="card featured">
+          <span class="tag">Best value</span>
+          <h3 style="margin-top: 16px;">3-day pass</h3>
+          <p class="price">$219 <span>all three days</span></p>
+          <ul>
+            <li>Friday, Saturday, and Sunday</li>
+            <li>Both stages</li>
+            <li>Priority entry lane</li>
+          </ul>
+          <a class="btn btn-primary" href="#faq" style="width: 100%;">Buy 3-day pass</a>
+        </article>
+        <article class="card">
+          <h3>VIP weekend</h3>
+          <p class="price">$389 <span>all three days</span></p>
+          <ul>
+            <li>All 3-day pass benefits</li>
+            <li>Viewing deck and lounge</li>
+            <li>Festival poster and lanyard</li>
+          </ul>
+          <a class="btn btn-outline" href="#faq" style="width: 100%;">Buy VIP</a>
+        </article>
+      </div>
+      <p class="muted" style="margin-top: 24px;">Checkout is a demo link on this page: ticket buttons lead to the FAQ section for entry and refund details. No payment is collected here.</p>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section id="faq">
+    <div class="wrap">
+      <p class="eyebrow">Before you go</p>
+      <h2>FAQ</h2>
+      <details open>
+        <summary>Is the festival all ages?</summary>
+        <p>Yes. Children under 12 enter free with a ticket-holding adult. The event is rain or shine.</p>
+      </details>
+      <details>
+        <summary>Can I change my day after buying a single-day ticket?</summary>
+        <p>Single-day tickets can be moved to another day before August 1, subject to availability for that day.</p>
+      </details>
+      <details>
+        <summary>What can I bring?</summary>
+        <p>One sealed water bottle, a small bag, and a rain jacket. Outside food, glass, and professional cameras are not permitted.</p>
+      </details>
+      <details>
+        <summary>Is the site accessible?</summary>
+        <p>Yes. Step-free routes, accessible viewing areas at both stages, and accessible toilets are on site.</p>
+      </details>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <p><strong>Neon Nights Music Festival</strong> &mdash; built with skill B Library-lookup.</p>
+    <p>Palette: background #14101E, surface #1E1930, text #F5F1FF, muted #B8B0CC, border #3A3352, primary #F2C14E. Type: Space Grotesk (display) and Inter (body).</p>
+    <p>MCP not live yet &mdash; built from the supplied spec.</p>
+  </div>
+</footer>
+
+<script>
+  var buttons = document.querySelectorAll('.btn-day');
+  var cards = ['day1', 'day2', 'day3'];
+  function showDay(id) {
+    cards.forEach(function (key) {
+      var el = document.getElementById(key);
+      if (el) el.hidden = (key !== id);
+    });
+    buttons.forEach(function (b) {
+      b.setAttribute('aria-pressed', b.getAttribute('data-target') === id ? 'true' : 'false');
+    });
+  }
+  buttons.forEach(function (b) {
+    b.addEventListener('click', function () { showDay(b.getAttribute('data-target')); });
+  });
+  document.querySelectorAll('[data-day]').forEach(function (link) {
+    link.addEventListener('click', function () { showDay(link.getAttribute('data-day')); });
+  });
+</script>
+</body>
+</html>

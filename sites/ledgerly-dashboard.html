@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ledgerly — Small-business finance dashboard</title>
+<style>
+  :root {
+    --bg: #F4F7F9;
+    --surface: #FFFFFF;
+    --text: #0F1E2E;
+    --muted: #475569;
+    --border: #D3DEE6;
+    --primary: #0F766E;
+    --radius: 12px;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
+    overflow-x: hidden;
+  }
+  a { color: var(--primary); }
+  .layout {
+    display: grid;
+    grid-template-columns: 248px minmax(0, 1fr);
+    min-height: 100vh;
+  }
+  /* Sidebar nav */
+  .sidebar {
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    padding: 24px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+  }
+  .logo { font-size: 24px; font-weight: 800; letter-spacing: -0.02em; margin: 0; }
+  .logo span { color: var(--muted); font-size: 14px; font-weight: 600; display: block; }
+  .nav { display: flex; flex-direction: column; gap: 8px; }
+  .nav a {
+    display: flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 8px 16px;
+    border-radius: var(--radius);
+    color: var(--text);
+    text-decoration: none;
+    font-weight: 600;
+    transition: transform 250ms ease, opacity 250ms ease;
+  }
+  .nav a:hover { transform: translateX(4px); opacity: 0.9; }
+  .nav a[aria-current="page"] { background: var(--bg); border: 1px solid var(--border); }
+  .sidebar-footer { margin-top: auto; }
+  .sidebar-footer a {
+    display: flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 8px 16px;
+    border-radius: var(--radius);
+    color: var(--muted);
+    text-decoration: none;
+    font-weight: 600;
+    transition: transform 250ms ease, opacity 250ms ease;
+  }
+  .sidebar-footer a:hover { transform: translateX(4px); opacity: 0.9; }
+  /* Main */
+  main { padding: 32px; max-width: 1120px; width: 100%; margin: 0 auto; }
+  section { margin-bottom: 64px; }
+  section:last-of-type { margin-bottom: 32px; }
+  .topbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 32px;
+  }
+  h1 { font-size: 32px; line-height: 1.2; margin: 0 0 8px; letter-spacing: -0.02em; }
+  h2 { font-size: 24px; margin: 0 0 8px; letter-spacing: -0.01em; }
+  p { color: var(--muted); margin: 0 0 16px; max-width: 64ch; }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    min-width: 44px;
+    padding: 8px 24px;
+    border: 0;
+    border-radius: var(--radius);
+    background: var(--primary);
+    color: var(--surface);
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 250ms ease, opacity 250ms ease;
+  }
+  .btn:hover { transform: translateY(-2px); opacity: 0.92; }
+  .btn-secondary {
+    background: var(--surface);
+    color: var(--text);
+    border: 1px solid var(--border);
+  }
+  /* Stats cards */
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 16px;
+  }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+    transition: transform 250ms ease, opacity 250ms ease;
+  }
+  .card:hover { transform: translateY(-2px); opacity: 1; }
+  .card .label { color: var(--muted); font-size: 14px; font-weight: 600; margin: 0 0 8px; }
+  .card .value { font-family: "JetBrains Mono", ui-monospace, monospace; font-size: 28px; font-weight: 700; margin: 0 0 8px; }
+  .card .delta { color: var(--muted); font-size: 14px; margin: 0; }
+  /* Chart area */
+  .chart-wrap {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+  }
+  .chart-wrap svg { width: 100%; height: auto; display: block; }
+  .chart-legend { display: flex; gap: 24px; flex-wrap: wrap; color: var(--muted); font-size: 14px; margin: 0 0 16px; }
+  .chart-legend span::before { content: "● "; color: var(--primary); }
+  .chart-legend span:nth-child(2)::before { color: var(--muted); }
+  /* Transactions table */
+  .table-wrap {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow-x: auto;
+  }
+  table { width: 100%; border-collapse: collapse; min-width: 560px; }
+  th, td { text-align: left; padding: 16px; border-bottom: 1px solid var(--border); }
+  th { color: var(--muted); font-size: 14px; }
+  td { font-size: 15px; }
+  tr:last-child td { border-bottom: 0; }
+  .mono { font-family: "JetBrains Mono", ui-monospace, monospace; }
+  .tag {
+    display: inline-flex;
+    align-items: center;
+    min-height: 32px;
+    padding: 4px 8px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--muted);
+    font-size: 14px;
+  }
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 24px 0 8px;
+    color: var(--muted);
+    font-size: 14px;
+  }
+  /* Responsive: single column at phone width, sidebar collapses */
+  @media (max-width: 640px) {
+    .layout { grid-template-columns: minmax(0, 1fr); }
+    .sidebar { position: static; height: auto; border-right: 0; border-bottom: 1px solid var(--border); padding: 16px; gap: 16px; }
+    .nav { flex-direction: row; flex-wrap: wrap; }
+    .nav a { flex: 1 1 auto; justify-content: center; }
+    .sidebar-footer { margin-top: 0; }
+    main { padding: 24px 16px; }
+    section { margin-bottom: 64px; }
+    .stats { grid-template-columns: minmax(0, 1fr); }
+    h1 { font-size: 28px; }
+    table { min-width: 0; }
+    th, td { padding: 8px; }
+  }
+</style>
+</head>
+<body>
+<div class="layout">
+  <aside class="sidebar" aria-label="Main navigation">
+    <p class="logo">Ledgerly<span>Small-business finance</span></p>
+    <nav class="nav" aria-label="Dashboard sections">
+      <a href="#overview" aria-current="page">Overview</a>
+      <a href="#transactions">Transactions</a>
+      <a href="#reports">Reports</a>
+    </nav>
+    <div class="sidebar-footer">
+      <a href="#settings">Settings</a>
+    </div>
+  </aside>
+
+  <main>
+    <div class="topbar">
+      <div>
+        <h1>Rivera Bakery — finance at a glance</h1>
+        <p>Your money at a glance — what came in, what went out, and what is still owed.</p>
+      </div>
+      <button class="btn" type="button" id="exportBtn">Export report</button>
+    </div>
+
+    <section id="overview" aria-labelledby="overview-heading">
+      <h2 id="overview-heading">Overview</h2>
+      <p>October at a glance. Start here, then check the transactions below.</p>
+      <div class="stats">
+        <article class="card">
+          <p class="label">Revenue this month</p>
+          <p class="value">$18,420</p>
+          <p class="delta">Up 12% vs September</p>
+        </article>
+        <article class="card">
+          <p class="label">Expenses this month</p>
+          <p class="value">$9,860</p>
+          <p class="delta">Down 4% vs September</p>
+        </article>
+        <article class="card">
+          <p class="label">Net this month</p>
+          <p class="value">$8,560</p>
+          <p class="delta">Healthy margin for a small shop</p>
+        </article>
+        <article class="card">
+          <p class="label">Outstanding invoices</p>
+          <p class="value">$2,340</p>
+          <p class="delta">3 invoices awaiting payment</p>
+        </article>
+      </div>
+    </section>
+
+    <section aria-labelledby="chart-heading">
+      <h2 id="chart-heading">Cash flow</h2>
+      <p>Income against expenses across the last six months.</p>
+      <div class="chart-wrap" role="img" aria-label="Bar chart: revenue higher than expenses in each of the last six months, with the widest gap in October.">
+        <p class="chart-legend"><span>Revenue</span><span>Expenses</span></p>
+        <svg viewBox="0 0 720 260" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <g stroke="var(--border)" stroke-width="1">
+            <line x1="0" y1="40" x2="720" y2="40"></line>
+            <line x1="0" y1="110" x2="720" y2="110"></line>
+            <line x1="0" y1="180" x2="720" y2="180"></line>
+          </g>
+          <g fill="var(--primary)" opacity="0.9">
+            <rect x="30" y="90" width="36" height="130" rx="6"></rect>
+            <rect x="150" y="70" width="36" height="150" rx="6"></rect>
+            <rect x="270" y="80" width="36" height="140" rx="6"></rect>
+            <rect x="390" y="55" width="36" height="165" rx="6"></rect>
+            <rect x="510" y="65" width="36" height="155" rx="6"></rect>
+            <rect x="630" y="35" width="36" height="185" rx="6"></rect>
+          </g>
+          <g fill="var(--muted)" opacity="0.65">
+            <rect x="74" y="140" width="36" height="80" rx="6"></rect>
+            <rect x="194" y="130" width="36" height="90" rx="6"></rect>
+            <rect x="314" y="145" width="36" height="75" rx="6"></rect>
+            <rect x="434" y="125" width="36" height="95" rx="6"></rect>
+            <rect x="554" y="135" width="36" height="85" rx="6"></rect>
+            <rect x="674" y="120" width="36" height="100" rx="6"></rect>
+          </g>
+          <g fill="var(--muted)" font-size="13" font-family="Inter, sans-serif">
+            <text x="30" y="245">May</text>
+            <text x="150" y="245">Jun</text>
+            <text x="270" y="245">Jul</text>
+            <text x="390" y="245">Aug</text>
+            <text x="510" y="245">Sep</text>
+            <text x="630" y="245">Oct</text>
+          </g>
+        </svg>
+      </div>
+    </section>
+
+    <section id="transactions" aria-labelledby="transactions-heading">
+      <h2 id="transactions-heading">Recent transactions</h2>
+      <p>Check the latest money in and out before you export.</p>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th scope="col">Date</th><th scope="col">Description</th><th scope="col">Category</th><th scope="col">Amount</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Oct 30</td><td>Wholesale order — Corner Cafe</td><td><span class="tag">Sales</span></td><td class="mono">+$1,240.00</td></tr>
+            <tr><td>Oct 28</td><td>Flour and supplies</td><td><span class="tag">Supplies</span></td><td class="mono">−$486.50</td></tr>
+            <tr><td>Oct 26</td><td>Weekend market stall</td><td><span class="tag">Sales</span></td><td class="mono">+$890.00</td></tr>
+            <tr><td>Oct 24</td><td>Rent</td><td><span class="tag">Overhead</span></td><td class="mono">−$1,800.00</td></tr>
+            <tr><td>Oct 21</td><td>Catering invoice paid</td><td><span class="tag">Sales</span></td><td class="mono">+$2,150.00</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="reports" aria-labelledby="reports-heading">
+      <h2 id="reports-heading">Export report</h2>
+      <p>Download the transactions above as a CSV for your records or your accountant.</p>
+      <button class="btn btn-secondary" type="button" id="exportBtn2">Export report (CSV)</button>
+    </section>
+
+    <section id="settings" aria-labelledby="settings-heading">
+      <h2 id="settings-heading">Settings</h2>
+      <p>Business name, currency, and report preferences live here in the full product. This demo page keeps settings as a single landing section.</p>
+      <a class="btn btn-secondary" href="#overview">Back to overview</a>
+    </section>
+
+    <footer>
+      <p>skill C Pipeline · website Ledgerly · palette: bg #F4F7F9, surface #FFFFFF, text #0F1E2E, muted #475569, border #D3DEE6, primary #0F766E · MCP not live yet — built from the supplied spec.</p>
+    </footer>
+  </main>
+</div>
+<script>
+  function downloadReport() {
+    var rows = [
+      ["Date", "Description", "Category", "Amount"],
+      ["Oct 30", "Wholesale order - Corner Cafe", "Sales", "1240.00"],
+      ["Oct 28", "Flour and supplies", "Supplies", "-486.50"],
+      ["Oct 26", "Weekend market stall", "Sales", "890.00"],
+      ["Oct 24", "Rent", "Overhead", "-1800.00"],
+      ["Oct 21", "Catering invoice paid", "Sales", "2150.00"]
+    ];
+    var csv = rows.map(function (r) { return r.join(","); }).join("\n");
+    var blob = new Blob([csv], { type: "text/csv" });
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "ledgerly-report.csv";
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }
+  document.getElementById("exportBtn").addEventListener("click", downloadReport);
+  document.getElementById("exportBtn2").addEventListener("click", downloadReport);
+</script>
+</body>
+</html>

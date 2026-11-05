@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Saffron Kitchen — Food Delivery</title>
+<!--
+  Design system (from supplied spec only):
+  Concept score: 8/10 — Warm, home-style delivery concept. Clear in one line,
+  appetite-led hero, short menu-to-checkout flow, easy to browse on a phone.
+  Deductions: menu needs photos in a real build (omitted here by brief: no images),
+  and delivery-area / live timing would need real data before launch.
+  Palette roles: bg, surface, text, muted, border, primary (values in :root only
+  for styling; footer lists them as text for disclosure).
+  Type: display DM Serif Display, body Inter.
+  Spacing: 8px grid. Radius: 16px. Section gap: 64px.
+  Motion: transform and opacity only, 250ms.
+  Components: nav, hero, menu grid, cart drawer/button, footer.
+  Flow: Land -> Browse menu -> Add to cart -> Checkout.
+  Responsive: single column at phone width, touch targets >= 44px, no horizontal overflow.
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #FFF7ED;
+    --surface: #FFFFFF;
+    --text: #1C1917;
+    --muted: #57534E;
+    --border: #E7DCCF;
+    --primary: #9A3412;
+    --primary-text: #FFFFFF;
+    --radius: 16px;
+    --section-gap: 64px;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: auto; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: Inter, system-ui, sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+  a { color: var(--primary); }
+  .wrap { max-width: 1120px; margin: 0 auto; padding-left: 24px; padding-right: 24px; width: 100%; }
+  /* Nav */
+  .nav {
+    position: sticky; top: 0; z-index: 20;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-inner {
+    max-width: 1120px; margin: 0 auto; padding: 16px 24px;
+    display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;
+  }
+  .logo { font-family: "DM Serif Display", Georgia, serif; font-size: 28px; line-height: 1.2; color: var(--text); text-decoration: none; min-height: 44px; display: flex; align-items: center; }
+  .logo span { color: var(--primary); }
+  .nav-links { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .nav-links a {
+    color: var(--text); text-decoration: none; font-weight: 600;
+    min-height: 44px; padding: 8px 16px; display: flex; align-items: center; border-radius: var(--radius);
+    transition: transform 250ms ease, opacity 250ms ease;
+  }
+  .nav-links a:hover { transform: translateY(-2px); }
+  button { font-family: inherit; font-size: 16px; cursor: pointer; }
+  .btn {
+    min-height: 44px; padding: 8px 24px; border-radius: var(--radius);
+    border: 1px solid var(--primary); background: var(--primary); color: var(--primary-text);
+    font-weight: 700; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    transition: transform 250ms ease, opacity 250ms ease;
+  }
+  .btn:hover { transform: translateY(-2px); opacity: 0.92; }
+  .btn:active { transform: scale(0.98); }
+  .btn-secondary { background: var(--surface); color: var(--text); border-color: var(--border); }
+  .btn-secondary:hover { transform: translateY(-2px); opacity: 0.92; }
+  .cart-count {
+    display: inline-flex; align-items: center; justify-content: center;
+    min-width: 24px; min-height: 24px; padding: 0 8px; border-radius: var(--radius);
+    background: var(--primary-text); color: var(--primary); font-size: 14px; font-weight: 700;
+  }
+  /* Sections */
+  section { padding-top: var(--section-gap); padding-bottom: var(--section-gap); }
+  section + section { padding-top: 0; }
+  h1, h2, h3 { font-family: "DM Serif Display", Georgia, serif; line-height: 1.15; margin: 0 0 16px 0; }
+  h1 { font-size: 56px; }
+  h2 { font-size: 40px; }
+  h3 { font-size: 24px; }
+  p { margin: 0 0 16px 0; }
+  .muted { color: var(--muted); }
+  .eyebrow { font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; font-size: 14px; color: var(--primary); margin-bottom: 16px; }
+  /* Hero */
+  .hero-grid { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 32px; align-items: center; }
+  .hero-actions { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 24px; }
+  .hero-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 32px;
+    transition: transform 250ms ease, opacity 250ms ease;
+  }
+  .hero-card:hover { transform: translateY(-4px); }
+  .saffron-mark {
+    width: 100%; height: 160px; border-radius: var(--radius);
+    background: var(--primary);
+    opacity: 0.92; margin-bottom: 24px;
+    transition: transform 250ms ease, opacity 250ms ease;
+  }
+  .saffron-mark:hover { transform: scale(1.02); }
+  .meta-row { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 16px; }
+  .meta-row span { border: 1px solid var(--border); border-radius: var(--radius); padding: 8px 16px; min-height: 44px; display: inline-flex; align-items: center; background: var(--surface); }
+  /* Menu */
+  .menu-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 32px; }
+  .dish {
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px;
+    display: flex; flex-direction: column; gap: 8px;
+    transition: transform 250ms ease, opacity 250ms ease;
+  }
+  .dish:hover { transform: translateY(-4px); }
+  .dish-top { display: flex; justify-content: space-between; gap: 16px; align-items: flex-start; }
+  .price { font-weight: 700; font-size: 18px; white-space: nowrap; }
+  .tag { font-size: 14px; font-weight: 600; color: var(--muted); }
+  .dish .btn { margin-top: 16px; width: 100%; }
+  /* Cart drawer */
+  .backdrop {
+    position: fixed; inset: 0; z-index: 30; background: var(--text); opacity: 0;
+    pointer-events: none; transition: opacity 250ms ease;
+  }
+  .backdrop.open { opacity: 0.45; pointer-events: auto; }
+  .drawer {
+    position: fixed; top: 0; right: 0; z-index: 31; height: 100%; width: 420px; max-width: 100%;
+    background: var(--surface); border-left: 1px solid var(--border);
+    border-radius: var(--radius) 0 0 var(--radius); padding: 24px;
+    transform: translateX(100%); opacity: 0.98;
+    transition: transform 250ms ease, opacity 250ms ease;
+    display: flex; flex-direction: column; overflow-y: auto;
+  }
+  .drawer.open { transform: translateX(0); opacity: 1; }
+  .drawer-head { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 24px; }
+  .drawer-head h2 { margin: 0; font-size: 32px; }
+  .icon-btn { min-width: 44px; min-height: 44px; border-radius: var(--radius); border: 1px solid var(--border); background: var(--surface); color: var(--text); font-size: 20px; transition: transform 250ms ease, opacity 250ms ease; }
+  .icon-btn:hover { transform: translateY(-2px); opacity: 0.92; }
+  .cart-item { display: flex; justify-content: space-between; gap: 16px; padding: 16px 0; border-top: 1px solid var(--border); }
+  .qty { display: flex; gap: 8px; align-items: center; margin-top: 8px; }
+  .qty button { min-width: 44px; min-height: 44px; border-radius: var(--radius); border: 1px solid var(--border); background: var(--surface); transition: transform 250ms ease, opacity 250ms ease; }
+  .qty button:hover { transform: translateY(-2px); }
+  .total-row { display: flex; justify-content: space-between; font-weight: 700; font-size: 18px; padding: 16px 0; border-top: 1px solid var(--border); margin-top: 16px; }
+  .checkout-box { border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; margin-top: 16px; }
+  .checkout-box label { display: block; font-weight: 600; margin: 16px 0 8px 0; }
+  .checkout-box input, .checkout-box select {
+    width: 100%; min-height: 44px; padding: 8px 16px; border-radius: var(--radius);
+    border: 1px solid var(--border); background: var(--surface); color: var(--text); font: inherit;
+  }
+  .confirmation { display: none; border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; margin-top: 16px; }
+  .confirmation.show { display: block; }
+  /* Footer */
+  footer { border-top: 1px solid var(--border); background: var(--surface); padding: 32px 0; }
+  footer p { margin-bottom: 8px; }
+  /* Responsive: two columns on tablets, single column at phone width */
+  @media (max-width: 900px) {
+    .menu-grid { grid-template-columns: repeat(2, 1fr); }
+    .hero-grid { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 640px) {
+    h1 { font-size: 40px; }
+    h2 { font-size: 32px; }
+    .wrap { padding-left: 16px; padding-right: 16px; }
+    .nav-inner { padding: 16px; }
+    .hero-grid, .menu-grid { grid-template-columns: 1fr; }
+    .drawer { width: 100%; border-radius: 0; }
+    .hero-actions .btn { width: 100%; }
+  }
+</style>
+</head>
+<body>
+<header class="nav">
+  <div class="nav-inner">
+    <a class="logo" href="#top">Saffron <span>&nbsp;Kitchen</span></a>
+    <nav class="nav-links" aria-label="Main navigation">
+      <a href="#menu">Menu</a>
+      <button class="btn" type="button" id="open-cart" aria-label="Open cart">Cart <span class="cart-count" id="cart-count" aria-live="polite">0</span></button>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+  <section>
+    <div class="wrap hero-grid">
+      <div>
+        <p class="eyebrow">Home-style cooking, delivered hot</p>
+        <h1>Real saffron. Real comfort. At your door.</h1>
+        <p class="muted">Slow-cooked curries, fragrant biryanis, and fresh bread — made to order and delivered in about 30 minutes. No fuss, just good food.</p>
+        <div class="hero-actions">
+          <a class="btn" href="#menu">Browse the menu</a>
+          <button class="btn btn-secondary" type="button" id="hero-cart">View cart</button>
+        </div>
+        <div class="meta-row" aria-label="Delivery details">
+          <span>Delivery in ~30 min</span>
+          <span>Free over $35</span>
+          <span>Halal options</span>
+        </div>
+      </div>
+      <div class="hero-card" aria-label="Today at Saffron Kitchen">
+        <div class="saffron-mark" aria-hidden="true"></div>
+        <h2>Today&rsquo;s special</h2>
+        <p><strong>Chicken Biryani</strong> — saffron rice, slow-cooked chicken, fried onions, raita.</p>
+        <p class="muted">$16.50 &middot; Serves one generously</p>
+        <button class="btn" type="button" data-add="Chicken Biryani" data-price="16.50">Add to cart</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="menu">
+    <div class="wrap">
+      <p class="eyebrow">Browse the menu</p>
+      <h2>What are you craving?</h2>
+      <p class="muted">Pick a dish, add it to your cart, then check out. Prices in CAD.</p>
+      <div class="menu-grid">
+        <article class="dish">
+          <div class="dish-top"><h3>Butter Chicken</h3><span class="price">$17.00</span></div>
+          <p class="muted">Tomato, cream, and butter sauce with tender chicken. Served with rice.</p>
+          <p class="tag">Mild &middot; Gluten-free option</p>
+          <button class="btn" type="button" data-add="Butter Chicken" data-price="17.00">Add to cart</button>
+        </article>
+        <article class="dish">
+          <div class="dish-top"><h3>Chicken Biryani</h3><span class="price">$16.50</span></div>
+          <p class="muted">Saffron rice layered with spiced chicken, herbs, and fried onions.</p>
+          <p class="tag">Medium spice &middot; With raita</p>
+          <button class="btn" type="button" data-add="Chicken Biryani" data-price="16.50">Add to cart</button>
+        </article>
+        <article class="dish">
+          <div class="dish-top"><h3>Paneer Tikka</h3><span class="price">$14.00</span></div>
+          <p class="muted">Char-grilled paneer, peppers, and onions with mint chutney.</p>
+          <p class="tag">Vegetarian &middot; Starter</p>
+          <button class="btn" type="button" data-add="Paneer Tikka" data-price="14.00">Add to cart</button>
+        </article>
+        <article class="dish">
+          <div class="dish-top"><h3>Vegetable Korma</h3><span class="price">$13.50</span></div>
+          <p class="muted">Creamy cashew sauce with seasonal vegetables. Served with rice.</p>
+          <p class="tag">Vegetarian &middot; Mild</p>
+          <button class="btn" type="button" data-add="Vegetable Korma" data-price="13.50">Add to cart</button>
+        </article>
+        <article class="dish">
+          <div class="dish-top"><h3>Lamb Rogan Josh</h3><span class="price">$19.00</span></div>
+          <p class="muted">Slow-braised lamb in a rich, warming Kashmiri-style sauce.</p>
+          <p class="tag">Medium-hot &middot; Fan favourite</p>
+          <button class="btn" type="button" data-add="Lamb Rogan Josh" data-price="19.00">Add to cart</button>
+        </article>
+        <article class="dish">
+          <div class="dish-top"><h3>Garlic Naan</h3><span class="price">$4.50</span></div>
+          <p class="muted">Fresh from the tandoor, brushed with garlic butter.</p>
+          <p class="tag">Vegetarian &middot; Baked to order</p>
+          <button class="btn" type="button" data-add="Garlic Naan" data-price="4.50">Add to cart</button>
+        </article>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <p><strong>Saffron Kitchen</strong> &middot; Food delivery, made with care.</p>
+    <p class="muted">Open daily 11:00am &ndash; 10:00pm &middot; Delivery in ~30 minutes &middot; Free delivery over $35.</p>
+    <p>skill C Pipeline, website Saffron Kitchen, palette: bg #FFF7ED, surface #FFFFFF, text #1C1917, muted #57534E, border #E7DCCF, primary #9A3412. MCP not live yet &mdash; built from the supplied spec.</p>
+  </div>
+</footer>
+
+<div class="backdrop" id="backdrop" aria-hidden="true"></div>
+<aside class="drawer" id="drawer" aria-label="Cart" aria-hidden="true">
+  <div class="drawer-head">
+    <h2>Your cart</h2>
+    <button class="icon-btn" type="button" id="close-cart" aria-label="Close cart">&times;</button>
+  </div>
+  <div id="cart-items" aria-live="polite"></div>
+  <div class="total-row"><span>Total</span><span id="cart-total">$0.00</span></div>
+  <div class="checkout-box">
+    <h3>Checkout</h3>
+    <label for="cust-name">Name</label>
+    <input id="cust-name" type="text" placeholder="Your name" autocomplete="name">
+    <label for="cust-address">Delivery address</label>
+    <input id="cust-address" type="text" placeholder="Street address" autocomplete="street-address">
+    <label for="pay-method">Payment</label>
+    <select id="pay-method">
+      <option>Card on delivery</option>
+      <option>Cash on delivery</option>
+    </select>
+    <p class="muted" style="margin-top: 16px;">This demo checkout confirms your order on this page. No payment is taken here.</p>
+    <button class="btn" type="button" id="checkout-btn" style="width: 100%; margin-top: 16px;">Place order</button>
+  </div>
+  <div class="confirmation" id="confirmation" role="status">
+    <h3>Order confirmed &mdash; thank you!</h3>
+    <p class="muted">Your Saffron Kitchen order is being prepared. Estimated delivery: about 30 minutes.</p>
+  </div>
+</aside>
+
+<script>
+  const cart = new Map();
+  const countEl = document.getElementById('cart-count');
+  const itemsEl = document.getElementById('cart-items');
+  const totalEl = document.getElementById('cart-total');
+  const drawer = document.getElementById('drawer');
+  const backdrop = document.getElementById('backdrop');
+  const confirmation = document.getElementById('confirmation');
+
+  function money(n) { return '$' + n.toFixed(2); }
+  function render() {
+    let count = 0, total = 0, html = '';
+    if (cart.size === 0) {
+      html = '<p class="muted">Your cart is empty. Browse the menu and add something tasty.</p>';
+    }
+    cart.forEach(function(item, name) {
+      count += item.qty; total += item.qty * item.price;
+      html += '<div class="cart-item"><div><strong>' + name + '</strong><p class="muted">' + money(item.price) + ' each</p>'
+        + '<div class="qty"><button type="button" aria-label="Decrease quantity" data-dec="' + name + '">&minus;</button>'
+        + '<span>' + item.qty + '</span>'
+        + '<button type="button" aria-label="Increase quantity" data-inc="' + name + '">+</button></div></div>'
+        + '<strong>' + money(item.qty * item.price) + '</strong></div>';
+    });
+    itemsEl.innerHTML = html;
+    countEl.textContent = count;
+    totalEl.textContent = money(total);
+    itemsEl.querySelectorAll('[data-inc]').forEach(function(b) {
+      b.addEventListener('click', function() { const it = cart.get(b.getAttribute('data-inc')); it.qty++; render(); });
+    });
+    itemsEl.querySelectorAll('[data-dec]').forEach(function(b) {
+      b.addEventListener('click', function() {
+        const name = b.getAttribute('data-dec'); const it = cart.get(name); it.qty--;
+        if (it.qty <= 0) { cart.delete(name); }
+        render();
+      });
+    });
+  }
+  function openCart() { drawer.classList.add('open'); backdrop.classList.add('open'); drawer.setAttribute('aria-hidden', 'false'); }
+  function closeCart() { drawer.classList.remove('open'); backdrop.classList.remove('open'); drawer.setAttribute('aria-hidden', 'true'); }
+  document.getElementById('open-cart').addEventListener('click', openCart);
+  document.getElementById('hero-cart').addEventListener('click', openCart);
+  document.getElementById('close-cart').addEventListener('click', closeCart);
+  backdrop.addEventListener('click', closeCart);
+  document.querySelectorAll('[data-add]').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      const name = btn.getAttribute('data-add');
+      const price = parseFloat(btn.getAttribute('data-price'));
+      const existing = cart.get(name);
+      if (existing) { existing.qty++; } else { cart.set(name, { price: price, qty: 1 }); }
+      confirmation.classList.remove('show');
+      render(); openCart();
+    });
+  });
+  document.getElementById('checkout-btn').addEventListener('click', function() {
+    if (cart.size === 0) { alert('Your cart is empty. Add a dish first.'); return; }
+    confirmation.classList.add('show');
+    cart.clear(); render();
+  });
+  render();
+</script>
+</body>
+</html>
