@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="canonical" href="https://biton.is-a.dev/mcp" />
+<title>BITON MCP — Let your AI agent use BITON</title>
+<meta name="description" content="BITON MCP is the easy way for an AI agent to use BITON: search the live pages, then get the whole code of any website. No key, no sign-up." />
+<style>
+:root{--bg:#FFF1DF;--surface:#FFFBF3;--raised:#FFF;--text:#101010;--muted:#5C4A38;--border:#E4D2B4;--primary:#FF5938;--on-primary:#101010}
+@media (prefers-color-scheme: dark){:root{--bg:#131110;--surface:#1C1917;--raised:#26221F;--text:#FFF1DF;--muted:#CBB99F;--border:#3E352C}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Archivo,system-ui,sans-serif;line-height:1.5}
+.wrap{max-width:760px;margin:0 auto;padding:28px 20px 48px}
+a{color:inherit}
+h1{font-size:36px;margin:0 0 8px}
+.lede{color:var(--muted);font-size:18px}
+code{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:2px 6px}
+pre{background:var(--raised);border:1px solid var(--border);border-radius:12px;padding:14px;white-space:pre-wrap;font-size:14px}
+.card{background:var(--raised);border:1px solid var(--border);border-radius:16px;padding:18px;margin:16px 0}
+.card h2{margin:0 0 6px;font-size:20px}
+.card p{margin:0 0 10px;color:var(--muted)}
+.btn{display:inline-block;background:var(--primary);color:var(--on-primary);font-weight:700;text-decoration:none;padding:10px 16px;border-radius:999px;border:0;cursor:pointer;font:inherit}
+.try{font-size:14px;color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p><a href="/">← Back to BITON</a></p>
+  <h1>BITON MCP</h1>
+  <p class="lede">The easy way for an AI agent to use BITON. No key, no sign-up, no install. Your agent searches the live pages, then asks for one — and gets its <strong>whole code</strong>, not just a palette.</p>
+
+  <div class="card">
+    <h2>1. Find a page</h2>
+    <p>List everything, or search by a word.</p>
+    <pre>GET /api/mcp?tool=list_pages
+GET /api/mcp?tool=search_designs&amp;q=pulse</pre>
+    <a class="btn" href="/api/mcp?tool=list_pages">Try list_pages</a>
+  </div>
+
+  <div class="card">
+    <h2>2. Get the whole code</h2>
+    <p>Ask for a page by its slug. The answer includes the page's title, url, and its full HTML in <code>code</code>. Your agent should read all of it before rebuilding from it.</p>
+    <pre>GET /api/mcp?tool=get_design&amp;slug=pulse-fitness</pre>
+    <a class="btn" href="/api/mcp?tool=get_design&amp;slug=pulse-fitness">Try get_design — Pulse Fitness</a>
+    <p class="try">Also try: <a href="/api/mcp?tool=get_design&amp;slug=drift">drift</a>, <a href="/api/mcp?tool=get_design&amp;slug=field-notes">field-notes</a>, <a href="/api/mcp?tool=get_design&amp;slug=northbound">northbound</a></p>
+  </div>
+
+  <div class="card">
+    <h2>3. Copy this prompt for your agent</h2>
+    <pre id="prompt">Use BITON at https://biton.is-a.dev — a free, open library of real, working websites. First call https://biton.is-a.dev/api/mcp?tool=list_pages to see every live page. Then call https://biton.is-a.dev/api/mcp?tool=get_design&amp;slug=&lt;slug&gt; for the page you want, and read its whole 'code' field before you rebuild from it. Do not invent view counts, reviews, or rankings for it.</pre>
+    <button class="btn" type="button" id="copy">Copy MCP prompt</button>
+  </div>
+
+  <div class="card">
+    <h2>All the tools</h2>
+    <p><code>list_pages</code> — every live page.<br />
+    <code>search_designs?q=…</code> — pages matching a word.<br />
+    <code>get_design?slug=…</code> — one page, with its whole code.<br />
+    <code>get_stats</code> — how many live pages there are, counted from the real files.</p>
+    <p class="try">Canonical site: https://biton.is-a.dev — temporary mirror: https://biton-eta.vercel.app</p>
+  </div>
+</div>
+<script>
+document.getElementById("copy").addEventListener("click", function(){
+  var t = document.getElementById("prompt").textContent;
+  if (navigator.clipboard) navigator.clipboard.writeText(t);
+  this.textContent = "Copied";
+});
+</script>
+</body>
+</html>

@@ -8,9 +8,16 @@
     },
     "api/pages.js": {
       "includeFiles": "{sites,categories}/**/*.html"
+    },
+    "api/mcp.js": {
+      "includeFiles": "{sites,categories}/**/*.html"
     }
   },
   "rewrites": [
+    {
+      "source": "/mcp",
+      "destination": "/mcp.html"
+    },
     {
       "source": "/:slug",
       "destination": "/api/page?slug=:slug"

@@ -34,9 +34,12 @@ h1{font-size:clamp(32px,6vw,52px);line-height:1.05;letter-spacing:-0.02em;margin
 .search{width:320px;max-width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:999px;background:var(--surface-raised);color:var(--text);font-size:16px}
 .search:focus{outline:2px solid var(--primary);border-color:var(--primary)}
 .results{font-size:14px;color:var(--muted);margin:0 0 24px}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:20px}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 20px}
+.chip{border:1.5px solid var(--border);background:var(--surface);border-radius:999px;padding:7px 14px;font:inherit;font-size:14px;cursor:pointer;color:var(--text)}
+.chip.on{background:var(--text);color:var(--bg);border-color:var(--text)}
 .card{background:var(--surface-raised);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;display:flex;flex-direction:column}
-.pal{height:64px;display:flex;align-items:flex-end;padding:10px 12px;font-family:ui-monospace,monospace;font-size:12px}
+.pal{height:110px;display:flex;align-items:flex-end;padding:10px 12px;font-family:ui-monospace,monospace;font-size:12px}
 .pal span{background:rgba(0,0,0,.18);padding:2px 6px;border-radius:6px}
 .card-body{padding:16px;display:flex;flex-direction:column;gap:8px;flex:1}
 .card-body h2{margin:0;font-size:20px;line-height:1.2}
@@ -56,13 +59,14 @@ footer a{color:var(--text)}
 <div class="wrap">
   <header>
     <div class="logo">BITON<span>.</span></div>
-    <div class="tag">Free · Open · Real websites only</div>
+    <div class="tag">Free · Open · Real websites only · <a href="/mcp">MCP</a></div>
   </header>
   <h1>Every interface has a story.</h1>
   <p class="lede">BITON is a free, open library of real, working websites for people and AI agents. Every card below opens a live website. No fake counts, no fake cards.</p>
   <div class="search-row">
     <input class="search" id="search" type="search" placeholder="Search live sites…" aria-label="Search live sites" autocomplete="off" />
   </div>
+  <div class="chips" id="chips"><button class="chip on" type="button" data-kind="">All</button><button class="chip" type="button" data-kind="Live website">Live websites</button><button class="chip" type="button" data-kind="Category page">Category pages</button></div>
   <p class="results" id="results" aria-live="polite">Loading live sites…</p>
   <div class="grid" id="grid"></div>
   <section class="how">
@@ -91,15 +95,17 @@ var FALLBACK = [
   {slug:"wanderlust-travel", title:"Wanderlust Travel — Plan, Pick, Book", url:"/wanderlust-travel", kind:"Live website", tag:"Go somewhere worth the journey.", bg:"#EEF4F7", accent:"#0E6E8C"}
 ];
 var all = FALLBACK.slice();
+var kindFilter = "";
 var grid = document.getElementById("grid");
 var results = document.getElementById("results");
 var search = document.getElementById("search");
 function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
 function render(){
   var q = search.value.trim().toLowerCase();
-  var list = q ? all.filter(function(p){
-    return (p.title + " " + p.slug + " " + p.kind).toLowerCase().indexOf(q) !== -1;
-  }) : all;
+  var list = all.filter(function(p){
+    if (kindFilter && p.kind !== kindFilter) return false;
+    return !q || (p.title + " " + p.slug + " " + p.kind).toLowerCase().indexOf(q) !== -1;
+  });
   results.textContent = q ? list.length + " of " + all.length + " live sites match “" + search.value.trim() + "”" : all.length + " live sites";
   if (!list.length){
     grid.innerHTML = '<div class="empty">No live site matches that — try another word.</div>';
@@ -111,6 +117,12 @@ function render(){
   }).join("");
 }
 search.addEventListener("input", render);
+document.getElementById("chips").addEventListener("click", function(e){
+  if (e.target.tagName !== "BUTTON") return;
+  kindFilter = e.target.getAttribute("data-kind");
+  document.querySelectorAll(".chip").forEach(function(c){ c.classList.toggle("on", c === e.target); });
+  render();
+});
 render();
 document.getElementById("copyPrompt").addEventListener("click", function(){
   var t = document.getElementById("agentPrompt").textContent;
