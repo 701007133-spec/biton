@@ -37,12 +37,12 @@ footer{position:fixed;left:0;right:0;bottom:0;height:0}
 <div class="hint">Scroll to swipe · Tap video to play / pause</div>
 <script>
 var clips = [
-  {src:"assets/clip1.mp4", handle:"@stillstanding", title:"The call", text:"One phone call. Everything changes after this."},
-  {src:"assets/clip2.mp4", handle:"@stillstanding", title:"The pitch", text:"A cafe, a pitch, and a room full of doubt."},
-  {src:"assets/clip3.mp4", handle:"@stillstanding", title:"First yes", text:"The first yes is the loudest one."},
-  {src:"assets/clip4.mp4", handle:"@stillstanding", title:"Night grind", text:"Nobody sees the night grind."},
-  {src:"assets/clip5.mp4", handle:"@stillstanding", title:"The crowd", text:"Then the crowd shows up."},
-  {src:"assets/clip6.mp4", handle:"@stillstanding", title:"Still standing", text:"Keep going. That's the whole story."}
+  {src:"/sites/drift/assets/clip1.mp4", handle:"@stillstanding", title:"The call", text:"One phone call. Everything changes after this."},
+  {src:"/sites/drift/assets/clip2.mp4", handle:"@stillstanding", title:"The pitch", text:"A cafe, a pitch, and a room full of doubt."},
+  {src:"/sites/drift/assets/clip3.mp4", handle:"@stillstanding", title:"First yes", text:"The first yes is the loudest one."},
+  {src:"/sites/drift/assets/clip4.mp4", handle:"@stillstanding", title:"Night grind", text:"Nobody sees the night grind."},
+  {src:"/sites/drift/assets/clip5.mp4", handle:"@stillstanding", title:"The crowd", text:"Then the crowd shows up."},
+  {src:"/sites/drift/assets/clip6.mp4", handle:"@stillstanding", title:"Still standing", text:"Keep going. That's the whole story."}
 ];
 var liked = JSON.parse(localStorage.getItem("drift-likes") || "{}");
 var feed = document.getElementById("feed");
