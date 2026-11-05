@@ -11,4 +11,9 @@ Open `index.html` in a browser, or serve this folder with any static file server
 ## Project files
 
 - `index.html` contains the complete single-page site, its concept catalogue, styles, and scripts.
+- `contributions/` contains category-specific, browser-based contribution instructions. Submissions arrive as pull requests and are not published automatically.
 - `LICENSE` contains the MIT License for the source code. The BITON name and logo are brand assets and are not licensed by that code license.
+
+## Contribute without installing anything
+
+Choose a category in the site's contribution section, edit the suggested JSON file in GitHub's web editor, and open a pull request. A GitHub account is required, but no local tools are needed. Contributions remain pending until reviewed; accepted concepts can then be moved into the catalogue.

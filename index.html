@@ -509,12 +509,18 @@ ol.howto .codeblock{margin-top:14px;max-width:720px}
           <h2>Help build the library</h2>
           <p>BITON can grow with new design concepts and patterns. Contributions should clearly identify what is fictional and cite any real references they use.</p>
         </div>
-        <button class="btn btn-ink" type="button" id="contribBtn">Contribution steps</button>
+        <a class="btn btn-ink" href="https://github.com/adnqcr7-code/biton/tree/main/contributions" target="_blank" rel="noopener noreferrer">Contribution guide</a>
       </div>
       <div class="steps" id="contributionSteps">
-        <div class="step"><div class="num">01</div><h3>Describe the concept</h3><p>Share the idea, intended audience, and app type. Be clear that fictional products are concepts.</p></div>
-        <div class="step"><div class="num">02</div><h3>Document the design</h3><p>Propose a palette, typography, spacing, components, and a written user flow—without presenting mockups as real screenshots.</p></div>
-        <div class="step"><div class="num">03</div><h3>Credit real references</h3><p>If a concept draws from an existing product, identify the source and distinguish verified details from original ideas.</p></div>
+        <div class="step"><div class="num">01</div><h3>Choose a category</h3><p>Pick a folder below and open its contribution file in GitHub. No software installation is needed; a GitHub account is required.</p></div>
+        <div class="step"><div class="num">02</div><h3>Write your concept</h3><p>Use the folder's template. Clearly label fictional ideas and never present concept visuals as real screenshots.</p></div>
+        <div class="step"><div class="num">03</div><h3>Open a pull request</h3><p>Submit your file as a pull request. Every contribution stays pending until it has been reviewed and accepted.</p></div>
+      </div>
+      <div class="comp-list" style="margin-top:20px">
+        <a class="btn btn-ghost btn-sm" href="https://github.com/adnqcr7-code/biton/new/main/contributions/mobile-apps/concept.json" target="_blank" rel="noopener noreferrer">Mobile Apps</a>
+        <a class="btn btn-ghost btn-sm" href="https://github.com/adnqcr7-code/biton/new/main/contributions/websites/concept.json" target="_blank" rel="noopener noreferrer">Websites</a>
+        <a class="btn btn-ghost btn-sm" href="https://github.com/adnqcr7-code/biton/new/main/contributions/dashboards/concept.json" target="_blank" rel="noopener noreferrer">Dashboards</a>
+        <a class="btn btn-ghost btn-sm" href="https://github.com/adnqcr7-code/biton/new/main/contributions/components/concept.json" target="_blank" rel="noopener noreferrer">Components</a>
       </div>
     </div>
   </section>
@@ -1012,7 +1018,8 @@ function copyText(text,msg){
   }
 }
 var BITON_URL="https://biton-eta.vercel.app/";
-function designURL(d){ return BITON_URL+"#/design/"+encodeURIComponent(d.id); }
+function designURL(d){ return BITON_URL+encodeURIComponent(d.id); }
+function designHref(d){ return location.protocol==="file:" ? "#/design/"+encodeURIComponent(d.id) : "/"+encodeURIComponent(d.id); }
 /* ==================== GET THE FILES — download the website itself ==================== */
 function downloadBlob(blob,name){
   var a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=name;
@@ -1046,7 +1053,7 @@ function downloadReadme(){
   +"  from Google Fonts when online; the catalogue, styles, scripts and logo are\n"
   +"  embedded in the file.\n\n"
   +"PAGES (in-page routes)\n"
-  +"  #/  Home        #/explore  Explore concepts            #/design/<id>  One concept\n"
+  +"  /  Home        #/explore  Explore concepts              /<id>  One concept\n"
   +"  #/collections   Concept sets                          #/ai          Agent guidance\n\n"
   +"Every catalogue entry is a fictional design study, not a real product, verified\n"
   +"reference, or screenshot. BITON is for everyone and works with any AI agent.\n"
@@ -1071,7 +1078,7 @@ function cardHTML(d,cls){
   +'<button class="icon-btn'+(isSaved?' saved':'')+'" type="button" data-save="'+d.id+'" aria-label="'+(isSaved?'Remove':'Save')+' '+esc(d.title)+' '+(isSaved?'from':'to')+' favourites" aria-pressed="'+isSaved+'">'+heartSVG()+'</button>'
   +'<button class="icon-btn" type="button" data-copy="'+d.id+'" aria-label="Copy link to '+esc(d.title)+'">'+linkSVG()+'</button>'
   +'</div></div>'
-  +'<a class="card-body" href="#/design/'+d.id+'" style="text-decoration:none" aria-label="View '+esc(d.title)+'">'
+  +'<a class="card-body" href="'+designHref(d)+'" style="text-decoration:none" aria-label="View '+esc(d.title)+'">'
   +'<div class="card-meta"><span class="tag solid">'+esc(d.cat)+'</span><span class="tag">'+esc(d.sub)+'</span><span class="tag">'+esc(d.style)+'</span>'+(d.origin?'<span class="tag concept">'+esc(d.origin)+'</span>':'')+'</div>'
   +'<h3>'+esc(d.title)+'</h3>'
   +'<div class="card-stats"><span>Illustrative concept</span><span>'+d.platform.join(" · ")+'</span></div>'
@@ -1156,7 +1163,7 @@ function renderExplore(){
   var grid=document.getElementById("exploreGrid");
   grid.innerHTML = list.map(function(d){ return cardHTML(d); }).join("");
   document.getElementById("exploreEmpty").hidden = list.length>0;
-  document.getElementById("resultsLine").innerHTML = "Showing <b>"+list.length+"</b> of "+DESIGNS.length+" designs"
+  document.getElementById("resultsLine").innerHTML = "<b>"+list.length+"</b> matching concepts"
     + (state.coll>=0 && COLLECTIONS[state.coll] ? ' in “<b>'+esc(COLLECTIONS[state.coll].name)+'</b>”' : "")
     + (state.q ? ' for “<b>'+esc(state.q)+'</b>”' : "")
     + (state.savedOnly ? " · saved only" : "");
@@ -1169,7 +1176,7 @@ function renderHome(){
   document.getElementById("featuredGrid").innerHTML = featured.map(function(d){ return cardHTML(d,"std"); }).join("");
   var idx=document.getElementById("catIndex");
   idx.innerHTML = CATEGORIES.map(function(c,i){
-    var n=c.cat?countFor("cat",c.cat):c.type?countFor("type",c.type):c.color?ALL_COLORS.length:DESIGNS.filter(function(d){ return (d.tags+" "+d.sub+" "+d.cat).toLowerCase().indexOf(c.q)>=0; }).length;
+    var n=c.cat?countFor("cat",c.cat):c.type?countFor("type",c.type):c.color?ALL_COLORS.length:DESIGNS.filter(function(d){ return matchesSearch(d,c.q); }).length;
     var href=c.cat?"#/explore?cat="+encodeURIComponent(c.cat):c.type?"#/explore?type="+encodeURIComponent(c.type):c.color?"#/explore?color=all":"#/explore?q="+encodeURIComponent(c.q);
     var unit=c.color?" color groups":n===1?" design":" designs";
     return '<a class="cat-row" href="'+href+'"><span class="n">'+String(i+1).padStart(2,"0")+'</span><span><h3>'+esc(c.name)+'</h3><span class="desc">'+esc(c.desc)+'</span></span><span class="count">'+n+unit+' in this build</span><span class="arr" aria-hidden="true">→</span></a>';
@@ -1180,7 +1187,7 @@ function renderHome(){
   }).join("");
   var trend = DESIGNS.slice(4,9);
   document.getElementById("trendList").innerHTML = trend.map(function(d,i){
-    return '<a class="trend-item" href="#/design/'+d.id+'"><span class="rank">'+String(i+1).padStart(2,"0")+'</span><span class="trend-thumb">'+palThumb(d)+'</span><span><h3>'+esc(d.title)+'</h3><p>'+esc(d.cat)+' · '+esc(d.style)+' · '+esc(d.origin)+'</p></span></a>';
+    return '<a class="trend-item" href="'+designHref(d)+'"><span class="rank">'+String(i+1).padStart(2,"0")+'</span><span class="trend-thumb">'+palThumb(d)+'</span><span><h3>'+esc(d.title)+'</h3><p>'+esc(d.cat)+' · '+esc(d.style)+' · '+esc(d.origin)+'</p></span></a>';
   }).join("");
   var recent = DESIGNS.slice(-2);
   document.getElementById("recentGrid").innerHTML = recent.map(function(d){ return cardHTML(d,"std"); }).join("");
@@ -1252,6 +1259,13 @@ function show(name){
 function parseHash(){
   var h=location.hash||"#/";
   if(h==="#contribute"){ show("home"); setTimeout(function(){ var el=document.getElementById("contribute"); if(el) el.scrollIntoView(); },60); return; }
+  var path=location.pathname.replace(/^\/+|\/+$/g,"");
+  if((!location.hash||location.hash==="#")&&path&&path!=="index.html"){
+    var pathId;
+    try{ pathId=decodeURIComponent(path); }catch(e){ pathId=path; }
+    document.getElementById("mobileMenu").classList.remove("open");
+    show("design"); renderDesign(pathId); return;
+  }
   var parts=h.replace(/^#\//,"").split("?");
   var route=parts[0]; var params=new URLSearchParams(parts[1]||"");
   document.getElementById("mobileMenu").classList.remove("open");
@@ -1283,7 +1297,7 @@ document.addEventListener("click",function(e){
     persistSaved();
     updateSavedPill();
     var h=location.hash;
-    if(h.indexOf("#/design/")===0) renderDesign(id); else if(h.indexOf("#/explore")===0){ buildFilters(); renderExplore(); } else if(h==="#/"||h===""||h==="#") renderHome();
+    if(h.indexOf("#/design/")===0) renderDesign(id); else if(byId[decodeURIComponent(location.pathname.replace(/^\/+|\/+$/g,""))]) renderDesign(id); else if(h.indexOf("#/explore")===0){ buildFilters(); renderExplore(); } else if(h==="#/"||h===""||h==="#") renderHome();
     return;
   }
   var copyBtn=e.target.closest("[data-copy]");
@@ -1338,7 +1352,6 @@ document.getElementById("menuBtn").addEventListener("click",function(){
   var m=document.getElementById("mobileMenu"); var open=m.classList.toggle("open");
   this.setAttribute("aria-expanded",open?"true":"false"); this.setAttribute("aria-label",open?"Close menu":"Open menu");
 });
-document.getElementById("contribBtn").addEventListener("click",function(){ document.getElementById("contributionSteps").scrollIntoView({behavior:"smooth"}); });
 document.getElementById("filesBtn").addEventListener("click",goToFiles);
 document.getElementById("footerFilesLink").addEventListener("click",function(e){ e.preventDefault(); goToFiles(); });
 window.addEventListener("hashchange",parseHash);
