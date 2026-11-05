@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Crave — Food Delivery</title>
+<style>
+:root{--red:#991B1B;--accent:#DC2626;--cream:#FEF2F2;--ink:#1F2937;--muted:#6B7280;--line:#FECACA;--card:#FFFFFF;--green:#16A34A}
+*{box-sizing:border-box}
+body{margin:0;background:#E5E7EB;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:var(--ink)}
+.phone{max-width:390px;margin:0 auto;min-height:100dvh;background:var(--cream);display:flex;flex-direction:column}
+header{background:var(--red);color:#fff;padding:28px 20px 18px}
+header h1{margin:0;font-size:24px;font-weight:800}
+header .sub{font-size:13px;opacity:.85;margin-top:2px}
+main{flex:1;padding:18px 16px 96px;overflow-y:auto}
+.screen{display:none}
+.screen.on{display:block}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:14px}
+.card h2{margin:0 0 10px;font-size:15px}
+.search{width:100%;padding:12px 14px;border:1.5px solid var(--line);border-radius:999px;font:inherit;background:#fff;margin-bottom:14px}
+.rest{display:flex;gap:12px;padding:12px 0;border-top:1px solid var(--line);cursor:pointer;align-items:center}
+.rest:first-of-type{border-top:0}
+.logo{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;font-size:18px;flex:none}
+.rest .name{font-weight:700}
+.rest .meta{font-size:12px;color:var(--muted);margin-top:2px}
+.rest .time{margin-left:auto;font-size:12px;font-weight:700;color:var(--red);white-space:nowrap}
+.menu-item{display:flex;justify-content:space-between;gap:12px;padding:12px 0;border-top:1px solid var(--line);align-items:center}
+.menu-item:first-of-type{border-top:0}
+.menu-item .m-name{font-weight:700}
+.menu-item .m-desc{font-size:12px;color:var(--muted);margin-top:2px}
+.price{font-weight:800}
+.add{border:0;background:var(--accent);color:#fff;border-radius:999px;padding:8px 14px;font:inherit;font-weight:700;cursor:pointer;flex:none}
+.qty{display:flex;align-items:center;gap:10px}
+.qty button{width:32px;height:32px;border-radius:50%;border:1.5px solid var(--line);background:#fff;font:inherit;font-weight:700;cursor:pointer}
+.line{display:flex;justify-content:space-between;padding:10px 0;border-top:1px solid var(--line);font-size:14px}
+.line:first-of-type{border-top:0}
+.line.total{font-weight:800;font-size:16px}
+.cta{width:100%;background:var(--accent);color:#fff;border:0;border-radius:999px;padding:14px;font:inherit;font-weight:700;cursor:pointer;margin-top:12px}
+.cta:disabled{background:#9CA3AF;cursor:not-allowed}
+.ok{background:#DCFCE7;color:#14532D;border-radius:12px;padding:12px;font-weight:600;display:none;margin-top:12px}
+.note{font-size:13px;color:var(--muted)}
+.order{border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:12px;background:#fff}
+.order .o-top{display:flex;justify-content:space-between;font-weight:700}
+.order .o-sub{font-size:12px;color:var(--muted);margin-top:4px}
+.tabbar{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:100%;max-width:390px;background:#fff;border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(3,1fr);padding:8px 0 calc(8px + env(safe-area-inset-bottom))}
+.tabbar button{border:0;background:none;font:inherit;font-size:12px;color:var(--muted);cursor:pointer;padding:6px 0;position:relative}
+.tabbar button.on{color:var(--accent);font-weight:700}
+.tabbar .ic{display:block;font-size:20px;margin-bottom:2px}
+.badge{position:absolute;top:2px;right:22px;background:var(--accent);color:#fff;border-radius:999px;font-size:11px;font-weight:700;padding:2px 6px;display:none}
+</style>
+</head>
+<body>
+<div class="phone">
+  <header>
+    <h1>Crave</h1>
+    <div class="sub">Good food, delivered fast · London, Ontario</div>
+  </header>
+  <main>
+    <!-- HOME -->
+    <section class="screen on" id="screen-home">
+      <input class="search" id="search" type="search" placeholder="Search restaurants or dishes…" aria-label="Search restaurants" />
+      <div class="card">
+        <h2>Restaurants near you</h2>
+        <div id="restList"></div>
+      </div>
+    </section>
+
+    <!-- MENU -->
+    <section class="screen" id="screen-menu">
+      <div class="card">
+        <h2 id="menuTitle">Menu</h2>
+        <p class="note" id="menuMeta"></p>
+        <div id="menuList"></div>
+      </div>
+      <button class="cta" id="goCart" type="button">View cart</button>
+    </section>
+
+    <!-- CART -->
+    <section class="screen" id="screen-cart">
+      <div class="card">
+        <h2>Your cart</h2>
+        <div id="cartList"></div>
+        <div id="cartTotals"></div>
+        <button class="cta" id="checkoutBtn" type="button">Place order</button>
+        <div class="ok" id="orderOk"></div>
+      </div>
+      <div class="card">
+        <h2>Checkout summary</h2>
+        <div class="line"><span>Delivery fee</span><span id="feeLine">$2.99</span></div>
+        <div class="line"><span>Tax (13%)</span><span id="taxLine">$0.00</span></div>
+        <div class="line total"><span>Total</span><span id="totalLine">$0.00</span></div>
+        <p class="note">Pay on delivery. Your order appears under Orders once you place it.</p>
+      </div>
+    </section>
+
+    <!-- ORDERS -->
+    <section class="screen" id="screen-orders">
+      <div class="card">
+        <h2>Your orders</h2>
+        <div id="orderList"></div>
+      </div>
+    </section>
+  </main>
+  <nav class="tabbar" aria-label="Main navigation">
+    <button type="button" class="on" data-screen="home"><span class="ic">R</span>Restaurants</button>
+    <button type="button" data-screen="cart"><span class="ic">C</span>Cart<span class="badge" id="cartBadge">0</span></button>
+    <button type="button" data-screen="orders"><span class="ic">O</span>Orders</button>
+  </nav>
+</div>
+
+<script>
+var restaurants = [
+  {id:"saffron", name:"Saffron Kitchen", cuisine:"Middle Eastern · Halal", time:"25–35 min", color:"#991B1B", initials:"SK", menu:[
+    {name:"Chicken Shawarma Plate", desc:"Rice, salad, garlic sauce", price:14.99},
+    {name:"Lamb Kofta Wrap", desc:"Grilled kofta, tahini, pickles", price:11.50},
+    {name:"Lentil Soup", desc:"Lemon, cumin, fresh bread", price:7.99},
+    {name:"Baklava (2 pc)", desc:"Pistachio, honey, filo", price:5.50}
+  ]},
+  {id:"verde", name:"Verde Bowl Co.", cuisine:"Healthy bowls · Vegan options", time:"20–30 min", color:"#166534", initials:"VB", menu:[
+    {name:"Harvest Grain Bowl", desc:"Quinoa, roasted veg, tahini", price:13.25},
+    {name:"Green Goddess Salad", desc:"Kale, avocado, seeds, lime", price:12.00},
+    {name:"Sweet Potato Fries", desc:"Smoked paprika aioli", price:6.50}
+  ]},
+  {id:"noodle", name:"Noodle House", cuisine:"Asian · Noodles & dumplings", time:"30–40 min", color:"#92400E", initials:"NH", menu:[
+    {name:"Chicken Ramen", desc:"Rich broth, egg, scallions", price:15.99},
+    {name:"Pork Dumplings (8)", desc:"Pan-fried, chilli oil", price:9.99},
+    {name:"Veggie Pad Thai", desc:"Rice noodles, peanut, lime", price:13.50}
+  ]},
+  {id:"slice", name:"Slice & Co.", cuisine:"Pizza · Italian", time:"20–30 min", color:"#7C2D12", initials:"SC", menu:[
+    {name:"Margherita Pizza", desc:"Tomato, mozzarella, basil", price:16.00},
+    {name:"Pepperoni Pizza", desc:"Double pepperoni, mozzarella", price:18.50},
+    {name:"Garlic Knots (6)", desc:"Butter, parmesan, herbs", price:6.99}
+  ]}
+];
+var cart = {}; // itemKey -> {rest, name, price, qty}
+var orders = JSON.parse(localStorage.getItem("crave-orders") || "[]");
+var currentRest = null;
+function money(n){ return "$" + n.toFixed(2); }
+function cartCount(){ var n = 0; Object.keys(cart).forEach(function(k){ n += cart[k].qty; }); return n; }
+function cartSubtotal(){ var s = 0; Object.keys(cart).forEach(function(k){ s += cart[k].price * cart[k].qty; }); return s; }
+function renderRestaurants(){
+  var q = document.getElementById("search").value.trim().toLowerCase();
+  var list = restaurants.filter(function(r){
+    if (!q) return true;
+    if (r.name.toLowerCase().indexOf(q) !== -1 || r.cuisine.toLowerCase().indexOf(q) !== -1) return true;
+    return r.menu.some(function(m){ return m.name.toLowerCase().indexOf(q) !== -1; });
+  });
+  document.getElementById("restList").innerHTML = list.length ? list.map(function(r){
+    return '<div class="rest" data-rest="' + r.id + '"><div class="logo" style="background:' + r.color + '">' + r.initials + '</div><div><div class="name">' + r.name + '</div><div class="meta">' + r.cuisine + '</div></div><div class="time">' + r.time + '</div></div>';
+  }).join("") : '<p class="note">No restaurants match that search.</p>';
+  document.querySelectorAll(".rest").forEach(function(el){
+    el.addEventListener("click", function(){ openMenu(el.dataset.rest); });
+  });
+}
+function openMenu(id){
+  currentRest = restaurants.find(function(r){ return r.id === id; });
+  document.getElementById("menuTitle").textContent = currentRest.name;
+  document.getElementById("menuMeta").textContent = currentRest.cuisine + " · " + currentRest.time;
+  renderMenu();
+  show("menu");
+}
+function renderMenu(){
+  document.getElementById("menuList").innerHTML = currentRest.menu.map(function(m, i){
+    var key = currentRest.id + "-" + i;
+    var qty = cart[key] ? cart[key].qty : 0;
+    return '<div class="menu-item"><div><div class="m-name">' + m.name + '</div><div class="m-desc">' + m.desc + '</div><div class="price">' + money(m.price) + '</div></div>' +
+      (qty === 0
+        ? '<button type="button" class="add" data-add="' + i + '">Add</button>'
+        : '<div class="qty"><button type="button" data-dec="' + i + '">−</button><span>' + qty + '</span><button type="button" data-inc="' + i + '">+</button></div>') +
+      '</div>';
+  }).join("");
+  document.querySelectorAll("[data-add]").forEach(function(b){
+    b.addEventListener("click", function(){ changeQty(parseInt(b.dataset.add, 10), 1); });
+  });
+  document.querySelectorAll("[data-inc]").forEach(function(b){
+    b.addEventListener("click", function(){ changeQty(parseInt(b.dataset.inc, 10), 1); });
+  });
+  document.querySelectorAll("[data-dec]").forEach(function(b){
+    b.addEventListener("click", function(){ changeQty(parseInt(b.dataset.dec, 10), -1); });
+  });
+}
+function changeQty(i, d){
+  var m = currentRest.menu[i];
+  var key = currentRest.id + "-" + i;
+  if (!cart[key]) cart[key] = {rest: currentRest.name, name: m.name, price: m.price, qty: 0};
+  cart[key].qty += d;
+  if (cart[key].qty <= 0) delete cart[key];
+  renderMenu(); renderCart();
+}
+function renderCart(){
+  var badge = document.getElementById("cartBadge");
+  var n = cartCount();
+  badge.style.display = n ? "inline-block" : "none";
+  badge.textContent = n;
+  var keys = Object.keys(cart);
+  document.getElementById("cartList").innerHTML = keys.length ? keys.map(function(k){
+    var it = cart[k];
+    return '<div class="menu-item"><div><div class="m-name">' + it.name + '</div><div class="m-desc">' + it.rest + ' · ' + money(it.price) + ' each</div></div><div class="qty"><button type="button" data-ckey="' + k + '" data-d="-1">−</button><span>' + it.qty + '</span><button type="button" data-ckey="' + k + '" data-d="1">+</button></div><div class="price">' + money(it.price * it.qty) + '</div></div>';
+  }).join("") : '<p class="note">Your cart is empty — pick a restaurant and add something.</p>';
+  document.querySelectorAll("[data-ckey]").forEach(function(b){
+    b.addEventListener("click", function(){
+      var it = cart[b.dataset.ckey];
+      it.qty += parseInt(b.dataset.d, 10);
+      if (it.qty <= 0) delete cart[b.dataset.ckey];
+      renderCart();
+      if (currentRest) renderMenu();
+    });
+  });
+  var sub = cartSubtotal();
+  var fee = keys.length ? 2.99 : 0;
+  var tax = sub * 0.13;
+  var total = sub + fee + tax;
+  document.getElementById("cartTotals").innerHTML = '<div class="line"><span>Subtotal</span><span>' + money(sub) + '</span></div>';
+  document.getElementById("feeLine").textContent = money(fee);
+  document.getElementById("taxLine").textContent = money(tax);
+  document.getElementById("totalLine").textContent = money(total);
+  document.getElementById("checkoutBtn").disabled = !keys.length;
+}
+function renderOrders(){
+  document.getElementById("orderList").innerHTML = orders.length ? orders.map(function(o){
+    return '<div class="order"><div class="o-top"><span>' + o.rest + '</span><span>' + money(o.total) + '</span></div><div class="o-sub">' + o.items + ' · ' + o.when + ' · ' + o.status + '</div></div>';
+  }).join("") : '<p class="note">No orders yet. Place your first order from the cart.</p>';
+}
+function show(id){
+  document.querySelectorAll(".screen").forEach(function(s){ s.classList.remove("on"); });
+  document.getElementById("screen-" + id).classList.add("on");
+  document.querySelectorAll(".tabbar button").forEach(function(b){ b.classList.toggle("on", b.dataset.screen === id || (id === "menu" && b.dataset.screen === "home")); });
+  if (id === "cart") renderCart();
+  if (id === "orders") renderOrders();
+  window.scrollTo(0,0);
+}
+document.querySelectorAll(".tabbar button").forEach(function(b){
+  b.addEventListener("click", function(){ show(b.dataset.screen); });
+});
+document.getElementById("search").addEventListener("input", renderRestaurants);
+document.getElementById("goCart").addEventListener("click", function(){ show("cart"); });
+document.getElementById("checkoutBtn").addEventListener("click", function(){
+  var keys = Object.keys(cart);
+  if (!keys.length) return;
+  var sub = cartSubtotal(), fee = 2.99, tax = sub * 0.13, total = sub + fee + tax;
+  var restNames = [...new Set(keys.map(function(k){ return cart[k].rest; }))].join(", ");
+  var itemCount = cartCount();
+  orders.unshift({rest: restNames, items: itemCount + (itemCount === 1 ? " item" : " items"), total: total, when: new Date().toLocaleString(), status: "Placed — arriving soon"});
+  localStorage.setItem("crave-orders", JSON.stringify(orders));
+  cart = {};
+  renderCart(); renderOrders();
+  var ok = document.getElementById("orderOk");
+  ok.style.display = "block";
+  ok.textContent = "Order placed — " + money(total) + " total. It is now under Orders.";
+});
+renderRestaurants(); renderCart(); renderOrders();
+</script>
+</body>
+</html>

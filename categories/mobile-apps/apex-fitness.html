@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Apex Fitness — Workout App</title>
+<style>
+:root{--dark:#111827;--orange:#F97316;--cream:#FFF7ED;--ink:#111827;--muted:#6B7280;--line:#FED7AA;--card:#FFFFFF;--green:#16A34A}
+*{box-sizing:border-box}
+body{margin:0;background:#E5E7EB;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:var(--ink)}
+.phone{max-width:390px;margin:0 auto;min-height:100dvh;background:var(--cream);display:flex;flex-direction:column}
+header{background:var(--dark);color:#fff;padding:28px 20px 18px}
+header h1{margin:0;font-size:15px;font-weight:600;opacity:.85}
+header .big{font-size:30px;font-weight:800;margin:6px 0 2px}
+header .sub{font-size:13px;opacity:.8}
+main{flex:1;padding:18px 16px 96px;overflow-y:auto}
+.screen{display:none}
+.screen.on{display:block}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:14px}
+.card h2{margin:0 0 10px;font-size:15px}
+.bar{height:10px;background:#FDEAD7;border-radius:999px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--orange);width:0}
+.bar-label{display:flex;justify-content:space-between;font-size:13px;color:var(--muted);margin-top:8px}
+.ex{display:flex;gap:12px;align-items:flex-start;padding:14px 0;border-top:1px solid #FDEAD7}
+.ex:first-of-type{border-top:0}
+.num{width:40px;height:40px;border-radius:12px;background:var(--dark);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;flex:none}
+.ex .name{font-weight:700}
+.ex .sets{font-size:13px;color:var(--muted);margin-top:2px}
+.sets-row{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.set{border:1.5px solid var(--line);background:#fff;border-radius:999px;padding:8px 12px;font:inherit;font-size:13px;font-weight:600;cursor:pointer}
+.set.done{background:var(--orange);border-color:var(--orange);color:#fff}
+.week{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;text-align:center}
+.day{border:1px solid var(--line);border-radius:12px;padding:10px 0;background:#fff}
+.day .d{font-size:12px;color:var(--muted)}
+.day .n{font-weight:800;font-size:18px}
+.day.done{background:var(--orange);border-color:var(--orange);color:#fff}
+.day.done .d{color:#fff}
+.stat{display:flex;justify-content:space-between;padding:10px 0;border-top:1px solid #FDEAD7;font-size:14px}
+.stat:first-of-type{border-top:0}
+.stat b{font-size:16px}
+.cta{width:100%;background:var(--orange);color:#fff;border:0;border-radius:999px;padding:14px;font:inherit;font-weight:700;cursor:pointer;margin-top:8px}
+.note{font-size:13px;color:var(--muted)}
+.tabbar{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:100%;max-width:390px;background:#fff;border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(3,1fr);padding:8px 0 calc(8px + env(safe-area-inset-bottom))}
+.tabbar button{border:0;background:none;font:inherit;font-size:12px;color:var(--muted);cursor:pointer;padding:6px 0}
+.tabbar button.on{color:var(--orange);font-weight:700}
+.tabbar .ic{display:block;font-size:20px;margin-bottom:2px}
+.plan{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-top:1px solid #FDEAD7}
+.plan:first-of-type{border-top:0}
+.plan .p-name{font-weight:700}
+.plan .p-sub{font-size:12px;color:var(--muted)}
+.plan button{border:1.5px solid var(--line);background:#fff;border-radius:999px;padding:8px 14px;font:inherit;font-weight:600;cursor:pointer}
+.plan button.on{background:var(--dark);color:#fff;border-color:var(--dark)}
+</style>
+</head>
+<body>
+<div class="phone">
+  <header>
+    <h1>Today's workout</h1>
+    <div class="big" id="workoutName">Full Body Strength</div>
+    <div class="sub" id="workoutMeta">45 min · 5 exercises · Intermediate</div>
+  </header>
+  <main>
+    <!-- TODAY -->
+    <section class="screen on" id="screen-today">
+      <div class="card">
+        <h2>Your progress today</h2>
+        <div class="bar"><i id="progressBar"></i></div>
+        <div class="bar-label"><span id="progressText">0 of 0 sets done</span><span id="progressPct">0%</span></div>
+      </div>
+      <div class="card">
+        <h2>Exercises</h2>
+        <div id="exerciseList"></div>
+        <button class="cta" id="finishBtn" type="button">Finish workout</button>
+        <p class="note" id="finishNote">Tap each set as you complete it. Nothing is counted until you tap it.</p>
+      </div>
+    </section>
+
+    <!-- PROGRESS -->
+    <section class="screen" id="screen-progress">
+      <div class="card">
+        <h2>This week</h2>
+        <div class="week" id="weekGrid"></div>
+        <p class="note">A day lights up only when you finish a workout on that day. Tap "Finish workout" on the Today tab to mark today done.</p>
+      </div>
+      <div class="card">
+        <h2>Your totals</h2>
+        <div class="stat"><span>Workouts finished</span><b id="statWorkouts">0</b></div>
+        <div class="stat"><span>Sets completed</span><b id="statSets">0</b></div>
+        <div class="stat"><span>Exercises done</span><b id="statExercises">0</b></div>
+        <div class="stat"><span>Current streak</span><b id="statStreak">0 days</b></div>
+      </div>
+    </section>
+
+    <!-- PLANS -->
+    <section class="screen" id="screen-plans">
+      <div class="card">
+        <h2>Choose a plan</h2>
+        <div id="planList"></div>
+      </div>
+      <div class="card">
+        <h2>About this plan</h2>
+        <p class="note" id="planAbout">Full Body Strength — 45 minutes, 5 exercises, built for 3 days a week.</p>
+      </div>
+    </section>
+  </main>
+  <nav class="tabbar" aria-label="Main navigation">
+    <button type="button" class="on" data-screen="today"><span class="ic">T</span>Today</button>
+    <button type="button" data-screen="progress"><span class="ic">P</span>Progress</button>
+    <button type="button" data-screen="plans"><span class="ic">P</span>Plans</button>
+  </nav>
+</div>
+
+<script>
+var plans = [
+  {name:"Full Body Strength", meta:"45 min · 5 exercises · Intermediate", about:"Full Body Strength — 45 minutes, 5 exercises, built for 3 days a week.", exercises:[
+    {name:"Goblet Squat", sets:["10 reps","10 reps","10 reps"]},
+    {name:"Push-Up", sets:["12 reps","12 reps","12 reps"]},
+    {name:"Dumbbell Row", sets:["10 reps each side","10 reps each side","10 reps each side"]},
+    {name:"Glute Bridge", sets:["15 reps","15 reps"]},
+    {name:"Plank", sets:["30 sec","30 sec","30 sec"]}
+  ]},
+  {name:"Upper Body Push", meta:"35 min · 4 exercises · Beginner", about:"Upper Body Push — 35 minutes, 4 exercises, a gentle start for new lifters.", exercises:[
+    {name:"Incline Push-Up", sets:["10 reps","10 reps","10 reps"]},
+    {name:"Overhead Press", sets:["8 reps","8 reps"]},
+    {name:"Tricep Dip", sets:["10 reps","10 reps"]},
+    {name:"Plank Shoulder Tap", sets:["20 taps","20 taps"]}
+  ]},
+  {name:"Legs & Core", meta:"40 min · 4 exercises · Advanced", about:"Legs & Core — 40 minutes, 4 exercises, for when you want a hard leg day.", exercises:[
+    {name:"Split Squat", sets:["8 reps each leg","8 reps each leg","8 reps each leg"]},
+    {name:"Romanian Deadlift", sets:["10 reps","10 reps","10 reps"]},
+    {name:"Wall Sit", sets:["45 sec","45 sec"]},
+    {name:"Dead Bug", sets:["10 reps each side","10 reps each side"]}
+  ]}
+];
+var currentPlan = 0;
+var state = JSON.parse(localStorage.getItem("apex-fitness") || '{"doneDays":{},"totalSets":0,"totalWorkouts":0}');
+function todayKey(){ var d = new Date(); return d.getFullYear() + "-" + (d.getMonth()+1) + "-" + d.getDate(); }
+function totalSets(){
+  var n = 0;
+  plans[currentPlan].exercises.forEach(function(e){ n += e.sets.length; });
+  return n;
+}
+function renderExercises(){
+  var p = plans[currentPlan];
+  document.getElementById("workoutName").textContent = p.name;
+  document.getElementById("workoutMeta").textContent = p.meta;
+  var done = 0, total = 0, exDone = 0;
+  var html = "";
+  p.exercises.forEach(function(e, ei){
+    var allDone = true;
+    var setsHtml = e.sets.map(function(s, si){
+      var key = currentPlan + "-" + ei + "-" + si;
+      var isDone = !!(state.sets && state.sets[key]);
+      if (isDone) done++; else allDone = false;
+      total++;
+      return '<button type="button" class="set' + (isDone ? " done" : "") + '" data-key="' + key + '">' + s + (isDone ? " ✓" : "") + '</button>';
+    }).join("");
+    if (allDone) exDone++;
+    html += '<div class="ex"><div class="num">' + (ei+1) + '</div><div style="flex:1"><div class="name">' + e.name + '</div><div class="sets">' + e.sets.length + ' sets</div><div class="sets-row">' + setsHtml + '</div></div></div>';
+  });
+  document.getElementById("exerciseList").innerHTML = html;
+  var pct = total ? Math.round(done / total * 100) : 0;
+  document.getElementById("progressBar").style.width = pct + "%";
+  document.getElementById("progressText").textContent = done + " of " + total + " sets done";
+  document.getElementById("progressPct").textContent = pct + "%";
+  document.querySelectorAll(".set").forEach(function(b){
+    b.addEventListener("click", function(){
+      var k = b.dataset.key;
+      state.sets = state.sets || {};
+      if (state.sets[k]) { delete state.sets[k]; state.totalSets--; }
+      else { state.sets[k] = true; state.totalSets++; }
+      localStorage.setItem("apex-fitness", JSON.stringify(state));
+      renderAll();
+    });
+  });
+}
+function renderWeek(){
+  var days = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
+  var today = new Date();
+  var monday = new Date(today); monday.setDate(today.getDate() - ((today.getDay() + 6) % 7));
+  var html = "";
+  for (var i = 0; i < 7; i++){
+    var d = new Date(monday); d.setDate(monday.getDate() + i);
+    var key = d.getFullYear() + "-" + (d.getMonth()+1) + "-" + d.getDate();
+    var done = !!state.doneDays[key];
+    html += '<div class="day' + (done ? " done" : "") + '"><div class="d">' + days[i] + '</div><div class="n">' + d.getDate() + '</div></div>';
+  }
+  document.getElementById("weekGrid").innerHTML = html;
+  var exDone = 0;
+  if (state.sets) {
+    var seen = {};
+    Object.keys(state.sets).forEach(function(k){ var ex = k.split("-").slice(0,2).join("-"); if (!seen[ex]) { seen[ex] = true; exDone++; } });
+  }
+  document.getElementById("statWorkouts").textContent = state.totalWorkouts;
+  document.getElementById("statSets").textContent = state.totalSets;
+  document.getElementById("statExercises").textContent = exDone;
+  var streak = 0, d2 = new Date();
+  if (!state.doneDays[todayKey()]) d2.setDate(d2.getDate()-1);
+  while (state.doneDays[d2.getFullYear() + "-" + (d2.getMonth()+1) + "-" + d2.getDate()]) { streak++; d2.setDate(d2.getDate()-1); }
+  document.getElementById("statStreak").textContent = streak + (streak === 1 ? " day" : " days");
+}
+function renderPlans(){
+  document.getElementById("planList").innerHTML = plans.map(function(p, i){
+    return '<div class="plan"><div><div class="p-name">' + p.name + '</div><div class="p-sub">' + p.meta + '</div></div><button type="button" data-plan="' + i + '" class="' + (i === currentPlan ? "on" : "") + '">' + (i === currentPlan ? "Selected" : "Select") + '</button></div>';
+  }).join("");
+  document.querySelectorAll("[data-plan]").forEach(function(b){
+    b.addEventListener("click", function(){
+      currentPlan = parseInt(b.dataset.plan, 10);
+      document.getElementById("planAbout").textContent = plans[currentPlan].about;
+      renderAll();
+    });
+  });
+}
+function renderAll(){ renderExercises(); renderWeek(); renderPlans(); }
+function show(id){
+  document.querySelectorAll(".screen").forEach(function(s){ s.classList.remove("on"); });
+  document.getElementById("screen-" + id).classList.add("on");
+  document.querySelectorAll(".tabbar button").forEach(function(b){ b.classList.toggle("on", b.dataset.screen === id); });
+  window.scrollTo(0,0);
+}
+document.querySelectorAll(".tabbar button").forEach(function(b){
+  b.addEventListener("click", function(){ show(b.dataset.screen); });
+});
+document.getElementById("finishBtn").addEventListener("click", function(){
+  var done = 0, total = totalSets();
+  if (state.sets) Object.keys(state.sets).forEach(function(k){ if (k.indexOf(currentPlan + "-") === 0) done++; });
+  if (done < total) {
+    document.getElementById("finishNote").textContent = "You have " + (total - done) + " set" + (total - done === 1 ? "" : "s") + " left in this workout — tap them done first.";
+    return;
+  }
+  state.doneDays[todayKey()] = true;
+  state.totalWorkouts++;
+  localStorage.setItem("apex-fitness", JSON.stringify(state));
+  document.getElementById("finishNote").textContent = "Workout finished — today is marked done on your Progress tab.";
+  renderAll();
+});
+renderAll();
+</script>
+</body>
+</html>

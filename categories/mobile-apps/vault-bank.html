@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Vault Bank — Mobile Banking</title>
+<style>
+:root{--green:#14532D;--green2:#166534;--cream:#F0FDF4;--accent:#16A34A;--ink:#111827;--muted:#6B7280;--line:#DCFCE7;--card:#FFFFFF;--red:#DC2626}
+*{box-sizing:border-box}
+body{margin:0;background:#E5E7EB;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:var(--ink)}
+.phone{max-width:390px;margin:0 auto;min-height:100dvh;background:var(--cream);display:flex;flex-direction:column;position:relative}
+header{background:var(--green);color:#fff;padding:28px 20px 18px}
+header .row{display:flex;justify-content:space-between;align-items:center}
+.avatar{width:42px;height:42px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px}
+header h1{margin:0;font-size:15px;font-weight:600;opacity:.9}
+.balance{font-size:38px;font-weight:800;letter-spacing:-.02em;margin:6px 0 2px}
+.balance-label{font-size:13px;opacity:.85}
+main{flex:1;padding:18px 16px 96px;overflow-y:auto}
+.screen{display:none}
+.screen.on{display:block}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:14px}
+.card h2{margin:0 0 10px;font-size:15px}
+.quick{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px}
+.quick button{border:1px solid var(--line);background:#fff;border-radius:14px;padding:12px 6px;font:inherit;font-weight:600;font-size:13px;cursor:pointer}
+.acct{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-top:1px solid var(--line)}
+.acct:first-of-type{border-top:0}
+.acct .name{font-weight:600}
+.acct .sub{font-size:12px;color:var(--muted)}
+.acct .amt{font-weight:700}
+.txn{display:flex;gap:12px;padding:12px 0;border-top:1px solid var(--line);align-items:center}
+.txn:first-of-type{border-top:0}
+.dot{width:38px;height:38px;border-radius:50%;background:var(--line);display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--green);flex:none}
+.txn .t-name{font-weight:600}
+.txn .t-date{font-size:12px;color:var(--muted)}
+.txn .t-amt{margin-left:auto;font-weight:700}
+.txn .t-amt.neg{color:var(--red)}
+.txn .t-amt.pos{color:var(--accent)}
+label{display:block;font-size:13px;font-weight:600;margin:12px 0 6px}
+input,select{width:100%;padding:12px;border:1.5px solid var(--line);border-radius:12px;font:inherit;background:#fff}
+.cta{width:100%;background:var(--accent);color:#fff;border:0;border-radius:999px;padding:14px;font:inherit;font-weight:700;cursor:pointer;margin-top:16px}
+.cta:disabled{background:#9CA3AF;cursor:not-allowed}
+.note{font-size:13px;color:var(--muted);margin-top:10px}
+.ok{background:#DCFCE7;color:var(--green);border-radius:12px;padding:12px;font-weight:600;display:none;margin-top:12px}
+.tabbar{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:100%;max-width:390px;background:#fff;border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(4,1fr);padding:8px 0 calc(8px + env(safe-area-inset-bottom))}
+.tabbar button{border:0;background:none;font:inherit;font-size:12px;color:var(--muted);cursor:pointer;padding:6px 0}
+.tabbar button.on{color:var(--green);font-weight:700}
+.tabbar .ic{display:block;font-size:20px;margin-bottom:2px}
+.cardnum{font-family:ui-monospace,monospace;letter-spacing:.08em}
+</style>
+</head>
+<body>
+<div class="phone">
+  <header>
+    <div class="row">
+      <div><h1>Good morning</h1><div style="font-weight:700">Alex Morgan</div></div>
+      <div class="avatar">AM</div>
+    </div>
+    <div class="balance-label">Total balance</div>
+    <div class="balance" id="balance">$2,847.50</div>
+    <div class="balance-label" id="balanceNote">Across 2 accounts</div>
+  </header>
+
+  <main>
+    <!-- HOME -->
+    <section class="screen on" id="screen-home">
+      <div class="quick">
+        <button type="button" data-goto="send">Send</button>
+        <button type="button" data-goto="send">Request</button>
+        <button type="button" data-goto="activity">Activity</button>
+      </div>
+      <div class="card">
+        <h2>Accounts</h2>
+        <div class="acct"><div><div class="name">Everyday Checking</div><div class="sub">•• 4821</div></div><div class="amt" id="checkingAmt">$1,924.30</div></div>
+        <div class="acct"><div><div class="name">Savings</div><div class="sub">•• 7730</div></div><div class="amt" id="savingsAmt">$923.20</div></div>
+      </div>
+      <div class="card">
+        <h2>Recent activity</h2>
+        <div id="recentList"></div>
+      </div>
+    </section>
+
+    <!-- SEND -->
+    <section class="screen" id="screen-send">
+      <div class="card">
+        <h2>Send money</h2>
+        <label for="recipient">To</label>
+        <select id="recipient">
+          <option>Sara Lee</option>
+          <option>Jordan Kim</option>
+          <option>Maya Patel</option>
+          <option>Tom Rivera</option>
+        </select>
+        <label for="amount">Amount ($)</label>
+        <input id="amount" type="number" min="1" max="1924" step="0.01" placeholder="0.00" inputmode="decimal" />
+        <label for="sendNote">Note (optional)</label>
+        <input id="sendNote" type="text" placeholder="Dinner, rent, thanks…" />
+        <button class="cta" id="sendBtn" type="button">Send money</button>
+        <div class="ok" id="sendOk"></div>
+        <p class="note">Sent from Everyday Checking. Your balance updates right away and the transfer appears in Activity.</p>
+      </div>
+    </section>
+
+    <!-- ACTIVITY -->
+    <section class="screen" id="screen-activity">
+      <div class="card">
+        <h2>Transactions</h2>
+        <div id="txnList"></div>
+      </div>
+    </section>
+
+    <!-- CARDS -->
+    <section class="screen" id="screen-cards">
+      <div class="card" style="background:var(--green);color:#fff;border-color:var(--green)">
+        <div style="font-size:13px;opacity:.85">Vault Debit</div>
+        <div class="cardnum" style="font-size:20px;margin:12px 0">•••• •••• •••• 4821</div>
+        <div style="display:flex;justify-content:space-between;font-size:13px"><span>ALEX MORGAN</span><span>09/29</span></div>
+      </div>
+      <div class="card">
+        <h2>Card settings</h2>
+        <div class="acct"><div><div class="name">Freeze card</div><div class="sub" id="freezeState">Card is active</div></div><button class="cta" style="width:auto;margin:0;padding:8px 14px" id="freezeBtn" type="button">Freeze</button></div>
+        <div class="acct"><div><div class="name">Online payments</div><div class="sub" id="onlineState">Allowed</div></div><button class="cta" style="width:auto;margin:0;padding:8px 14px" id="onlineBtn" type="button">Block</button></div>
+      </div>
+    </section>
+  </main>
+
+  <nav class="tabbar" aria-label="Main navigation">
+    <button type="button" class="on" data-screen="home"><span class="ic">H</span>Home</button>
+    <button type="button" data-screen="send"><span class="ic">S</span>Send</button>
+    <button type="button" data-screen="activity"><span class="ic">A</span>Activity</button>
+    <button type="button" data-screen="cards"><span class="ic">C</span>Cards</button>
+  </nav>
+</div>
+
+<script>
+var checking = 1924.30, savings = 923.20;
+var txns = [
+  {name:"Grocery Market", date:"Nov 4", amt:-86.20, kind:"out"},
+  {name:"Payroll — Northwind", date:"Nov 3", amt:1240.00, kind:"in"},
+  {name:"Coffee House", date:"Nov 3", amt:-6.40, kind:"out"},
+  {name:"Transfer to Savings", date:"Nov 2", amt:-200.00, kind:"out"},
+  {name:"Refund — Bookstore", date:"Nov 1", amt:18.99, kind:"in"}
+];
+function money(n){ return "$" + n.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ","); }
+function render(){
+  document.getElementById("balance").textContent = money(checking + savings);
+  document.getElementById("checkingAmt").textContent = money(checking);
+  document.getElementById("savingsAmt").textContent = money(savings);
+  var html = "";
+  txns.forEach(function(t){
+    var init = t.name.split(" ").map(function(w){ return w[0]; }).join("").slice(0,2).toUpperCase();
+    html += '<div class="txn"><div class="dot">' + init + '</div><div><div class="t-name">' + t.name + '</div><div class="t-date">' + t.date + '</div></div><div class="t-amt ' + (t.kind === "in" ? "pos" : "neg") + '">' + (t.kind === "in" ? "+" : "−") + money(Math.abs(t.amt)).slice(0) + '</div></div>';
+  });
+  document.getElementById("txnList").innerHTML = html;
+  document.getElementById("recentList").innerHTML = html;
+  var recent = document.getElementById("recentList");
+  recent.innerHTML = txns.slice(0,3).map(function(t){
+    var init = t.name.split(" ").map(function(w){ return w[0]; }).join("").slice(0,2).toUpperCase();
+    return '<div class="txn"><div class="dot">' + init + '</div><div><div class="t-name">' + t.name + '</div><div class="t-date">' + t.date + '</div></div><div class="t-amt ' + (t.kind === "in" ? "pos" : "neg") + '">' + (t.kind === "in" ? "+" : "−") + money(Math.abs(t.amt)) + '</div></div>';
+  }).join("");
+}
+function show(id){
+  document.querySelectorAll(".screen").forEach(function(s){ s.classList.remove("on"); });
+  document.getElementById("screen-" + id).classList.add("on");
+  document.querySelectorAll(".tabbar button").forEach(function(b){ b.classList.toggle("on", b.dataset.screen === id); });
+  window.scrollTo(0,0);
+}
+document.querySelectorAll(".tabbar button").forEach(function(b){
+  b.addEventListener("click", function(){ show(b.dataset.screen); });
+});
+document.querySelectorAll("[data-goto]").forEach(function(b){
+  b.addEventListener("click", function(){ show(b.dataset.goto); });
+});
+document.getElementById("sendBtn").addEventListener("click", function(){
+  var amt = parseFloat(document.getElementById("amount").value);
+  var to = document.getElementById("recipient").value;
+  var ok = document.getElementById("sendOk");
+  if (!amt || amt <= 0) { ok.style.display = "block"; ok.textContent = "Enter an amount above $0."; return; }
+  if (amt > checking) { ok.style.display = "block"; ok.textContent = "That is more than your checking balance of " + money(checking) + "."; return; }
+  checking -= amt;
+  txns.unshift({name:"Sent to " + to, date:"Today", amt:amt, kind:"out"});
+  render();
+  ok.style.display = "block";
+  ok.textContent = "Sent " + money(amt) + " to " + to + ". New checking balance: " + money(checking) + ".";
+  document.getElementById("amount").value = "";
+  document.getElementById("sendNote").value = "";
+});
+var frozen = false, onlineBlocked = false;
+document.getElementById("freezeBtn").addEventListener("click", function(){
+  frozen = !frozen;
+  document.getElementById("freezeState").textContent = frozen ? "Card is frozen" : "Card is active";
+  this.textContent = frozen ? "Unfreeze" : "Freeze";
+});
+document.getElementById("onlineBtn").addEventListener("click", function(){
+  onlineBlocked = !onlineBlocked;
+  document.getElementById("onlineState").textContent = onlineBlocked ? "Blocked" : "Allowed";
+  this.textContent = onlineBlocked ? "Allow" : "Block";
+});
+render();
+</script>
+</body>
+</html>
