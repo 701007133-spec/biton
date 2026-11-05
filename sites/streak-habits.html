@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Streak — One day at a time</title>
+<meta name="description" content="Streak is a habit tracker that works. Add a habit, tap it done today, and watch your real streak grow from real dates." />
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#0F172A;color:#F1F5F9;font-family:Inter,system-ui,sans-serif}
+.wrap{max-width:680px;margin:0 auto;padding:28px 20px 48px}
+h1{font-size:34px;margin:0 0 4px}
+.lede{color:#94A3B8;margin:0 0 20px}
+.addrow{display:flex;gap:10px}
+input{flex:1;padding:12px 14px;border-radius:999px;border:1.5px solid #334155;background:#1E293B;color:#F1F5F9;font:inherit}
+button{border:0;cursor:pointer;font:inherit;font-weight:700;border-radius:999px;padding:11px 18px;background:#22C55E;color:#052E16}
+.habit{background:#1E293B;border:1px solid #334155;border-radius:16px;padding:16px;margin-top:14px;display:flex;justify-content:space-between;gap:12px;align-items:center}
+.habit h2{margin:0;font-size:18px}
+.habit p{margin:4px 0 0;color:#94A3B8;font-size:14px}
+.done{background:#334155;color:#fff;padding:10px 14px}
+.done.on{background:#22C55E;color:#052E16}
+.del{background:transparent;color:#94A3B8;padding:8px 10px;font-size:13px}
+.today{color:#94A3B8;font-size:14px;margin-top:16px}
+.empty{color:#94A3B8}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Streak</h1>
+  <p class="lede">One day at a time. Tap a habit done today — your streak is counted from real dates, not made up.</p>
+  <div class="addrow"><input id="name" placeholder="New habit — e.g. Read 10 pages" aria-label="New habit" /><button id="add" type="button">Add</button></div>
+  <p class="today" id="today"></p>
+  <div id="list"></div>
+</div>
+<script>
+function day(d){ var x = d ? new Date(d) : new Date(); return x.getFullYear() + "-" + (x.getMonth()+1) + "-" + x.getDate(); }
+function yesterday(){ var d = new Date(); d.setDate(d.getDate()-1); return day(d); }
+var habits = JSON.parse(localStorage.getItem("streak-habits") || "[]");
+document.getElementById("today").textContent = "Today is " + new Date().toLocaleDateString(undefined, {weekday:"long", month:"long", day:"numeric"});
+function streak(h){
+  var s = 0, d = new Date();
+  if (!h.days[day(d)]) d.setDate(d.getDate()-1);
+  while (h.days[day(d)]) { s++; d.setDate(d.getDate()-1); }
+  return s;
+}
+function render(){
+  var list = document.getElementById("list");
+  list.innerHTML = habits.length ? "" : "<p class='empty'>No habits yet — add your first one above.</p>";
+  habits.forEach(function(h, i){
+    var done = !!h.days[day()];
+    var el = document.createElement("div");
+    el.className = "habit";
+    el.innerHTML = "<div><h2>" + h.name.replace(/</g,"&lt;") + "</h2><p>" + streak(h) + "-day streak · " + Object.keys(h.days).length + " days done</p></div>";
+    var btn = document.createElement("button");
+    btn.type = "button"; btn.className = "done" + (done ? " on" : ""); btn.textContent = done ? "Done today ✓" : "Mark done";
+    btn.onclick = function(){
+      if (done) delete habits[i].days[day()]; else habits[i].days[day()] = true;
+      localStorage.setItem("streak-habits", JSON.stringify(habits)); render();
+    };
+    var del = document.createElement("button");
+    del.type = "button"; del.className = "del"; del.textContent = "Delete";
+    del.onclick = function(){ habits.splice(i,1); localStorage.setItem("streak-habits", JSON.stringify(habits)); render(); };
+    var wrap = document.createElement("div"); wrap.appendChild(btn); wrap.appendChild(del);
+    el.appendChild(wrap); list.appendChild(el);
+  });
+}
+document.getElementById("add").addEventListener("click", function(){
+  var v = document.getElementById("name").value.trim();
+  if (!v) return;
+  habits.push({name:v, days:{}});
+  document.getElementById("name").value = "";
+  localStorage.setItem("streak-habits", JSON.stringify(habits)); render();
+});
+render();
+</script>
+</body>
+</html>

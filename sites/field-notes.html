@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Field Notes — Write it down, find it later</title>
+<meta name="description" content="Field Notes is a simple notes app that works. Write a note, search it, pin it, delete it. Notes live in your browser only." />
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#F6F1E7;color:#1C1917;font-family:Inter,system-ui,sans-serif}
+.wrap{max-width:760px;margin:0 auto;padding:28px 20px 48px}
+h1{font-size:34px;margin:0 0 4px}
+.lede{color:#57534E;margin:0 0 20px}
+textarea{width:100%;min-height:90px;padding:12px;border:1.5px solid #D6D3D1;border-radius:12px;font:inherit;background:#fff}
+button{border:0;cursor:pointer;font:inherit;font-weight:700;border-radius:999px;padding:10px 16px}
+.add{background:#1C1917;color:#fff}
+.search{width:100%;padding:11px 14px;border:1.5px solid #D6D3D1;border-radius:999px;font:inherit;margin:16px 0;background:#fff}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px}
+.note{background:#fff;border:1px solid #E7E5E4;border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:10px;white-space:pre-wrap}
+.note.pinned{border-color:#D97706}
+.note time{font-size:12px;color:#78716C}
+.row{display:flex;gap:8px}
+.row button{background:#F5F5F4;color:#1C1917;font-size:13px;padding:6px 10px}
+.count{color:#57534E;font-size:14px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Field Notes</h1>
+  <p class="lede">Write it down, find it later. Notes live in your browser only — nothing is sent anywhere.</p>
+  <textarea id="text" placeholder="Write a note…"></textarea>
+  <div style="margin-top:10px"><button class="add" id="add" type="button">Add note</button></div>
+  <input class="search" id="search" type="search" placeholder="Search your notes…" aria-label="Search notes" />
+  <p class="count" id="count"></p>
+  <div class="grid" id="grid"></div>
+</div>
+<script>
+var notes = JSON.parse(localStorage.getItem("field-notes") || "[]");
+var text = document.getElementById("text"), grid = document.getElementById("grid"),
+    search = document.getElementById("search"), count = document.getElementById("count");
+function save(){ localStorage.setItem("field-notes", JSON.stringify(notes)); }
+function render(){
+  var q = search.value.trim().toLowerCase();
+  var list = notes.map(function(n,i){ return {n:n, i:i}; }).filter(function(x){
+    return !q || x.n.text.toLowerCase().indexOf(q) !== -1;
+  });
+  list.sort(function(a,b){ return (b.n.pinned - a.n.pinned) || (b.n.created - a.n.created); });
+  count.textContent = notes.length + (notes.length === 1 ? " note" : " notes") + (q ? " · " + list.length + " match" : "");
+  grid.innerHTML = list.length ? "" : "<p style='color:#78716C'>No notes yet — write your first one above.</p>";
+  list.forEach(function(x){
+    var d = document.createElement("article");
+    d.className = "note" + (x.n.pinned ? " pinned" : "");
+    var t = document.createElement("div"); t.textContent = x.n.text; d.appendChild(t);
+    var tm = document.createElement("time"); tm.textContent = new Date(x.n.created).toLocaleString(); d.appendChild(tm);
+    var row = document.createElement("div"); row.className = "row";
+    var pin = document.createElement("button"); pin.type = "button"; pin.textContent = x.n.pinned ? "Unpin" : "Pin";
+    pin.onclick = function(){ notes[x.i].pinned = !notes[x.i].pinned; save(); render(); };
+    var del = document.createElement("button"); del.type = "button"; del.textContent = "Delete";
+    del.onclick = function(){ notes.splice(x.i, 1); save(); render(); };
+    row.appendChild(pin); row.appendChild(del); d.appendChild(row);
+    grid.appendChild(d);
+  });
+}
+document.getElementById("add").addEventListener("click", function(){
+  var v = text.value.trim();
+  if (!v) return;
+  notes.push({text:v, created:Date.now(), pinned:false});
+  text.value = ""; save(); render();
+});
+search.addEventListener("input", render);
+render();
+</script>
+</body>
+</html>
