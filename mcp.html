@@ -3,30 +3,26 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="theme-color" content="#090a0c" />
 <link rel="canonical" href="https://biton.is-a.dev/mcp" />
 <title>BITON MCP — Let your AI agent use BITON</title>
 <meta name="description" content="BITON MCP is the easy way for an AI agent to use BITON: search the live pages, then get the whole code of any website. No key, no sign-up." />
 <style>
-:root{--bg:#FFF1DF;--surface:#FFFBF3;--raised:#FFF;--text:#101010;--muted:#5C4A38;--border:#E4D2B4;--primary:#FF5938;--on-primary:#101010}
-@media (prefers-color-scheme: dark){:root{--bg:#131110;--surface:#1C1917;--raised:#26221F;--text:#FFF1DF;--muted:#CBB99F;--border:#3E352C}}
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--text);font-family:Archivo,system-ui,sans-serif;line-height:1.5}
-.wrap{max-width:760px;margin:0 auto;padding:28px 20px 48px}
-a{color:inherit}
-h1{font-size:36px;margin:0 0 8px}
-.lede{color:var(--muted);font-size:18px}
-code{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:2px 6px}
-pre{background:var(--raised);border:1px solid var(--border);border-radius:12px;padding:14px;white-space:pre-wrap;font-size:14px}
-.card{background:var(--raised);border:1px solid var(--border);border-radius:16px;padding:18px;margin:16px 0}
-.card h2{margin:0 0 6px;font-size:20px}
-.card p{margin:0 0 10px;color:var(--muted)}
-.btn{display:inline-block;background:var(--primary);color:var(--on-primary);font-weight:700;text-decoration:none;padding:10px 16px;border-radius:999px;border:0;cursor:pointer;font:inherit}
-.try{font-size:14px;color:var(--muted)}
+:root{color-scheme:dark;--bg:#08090b;--panel:#101216;--line:rgba(255,255,255,.105);--muted:#969ba5;--text:#f4f5f6;--lime:#d5ff71;--radius:20px;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-size:14px;line-height:1.55}a{color:inherit}.wrap{max-width:760px;margin:0 auto;padding:28px 20px 48px}
+header{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:28px}.brand{display:flex;align-items:center;gap:10px;font-size:19px;font-weight:800;letter-spacing:.17em;text-decoration:none}.brand-mark{width:27px;height:27px;border:1px solid rgba(213,255,113,.7);border-radius:8px;display:grid;place-items:center;color:var(--lime);font-size:14px}
+h1{font-size:clamp(36px,6vw,52px);line-height:1.02;letter-spacing:-.06em;font-weight:570;margin:0 0 12px}.lede{color:var(--muted);font-size:18px;line-height:1.7}
+code{background:#0b0d0f;border:1px solid var(--line);border-radius:6px;padding:2px 6px;color:#e7e9ec}pre{background:#0b0d0f;border:1px solid var(--line);border-radius:12px;padding:14px;white-space:pre-wrap;font-size:13px;color:#d9dce1;overflow-x:auto}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:22px;margin:16px 0}.card h2{margin:0 0 6px;font-size:20px;letter-spacing:-.03em}.card p{margin:0 0 12px;color:var(--muted);line-height:1.7}
+.btn{display:inline-block;background:var(--lime);color:#11140a;font-weight:700;text-decoration:none;padding:11px 18px;border-radius:999px;border:0;cursor:pointer;font:inherit}.btn-ghost{background:transparent;color:#f1f2f4;border:1px solid var(--line)}
+.try{font-size:13px;color:var(--muted)}.try a{color:#d9e8bd;text-decoration:underline}
+.back{color:var(--muted);font-size:13px}
+footer{margin-top:36px;font-size:13px;color:var(--muted)}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <p><a href="/">← Back to BITON</a></p>
+  <header><a class="brand" href="/"><span class="brand-mark">B</span>BITON</a><a href="/" class="back">← Back to BITON</a></header>
   <h1>BITON MCP</h1>
   <p class="lede">The easy way for an AI agent to use BITON. No key, no sign-up, no install. Your agent searches the live pages, then asks for one — and gets its <strong>whole code</strong>, not just a palette.</p>
 
@@ -43,7 +39,7 @@ GET /api/mcp?tool=search_designs&amp;q=pulse</pre>
     <p>Ask for a page by its slug. The answer includes the page's title, url, and its full HTML in <code>code</code>. Your agent should read all of it before rebuilding from it.</p>
     <pre>GET /api/mcp?tool=get_design&amp;slug=pulse-fitness</pre>
     <a class="btn" href="/api/mcp?tool=get_design&amp;slug=pulse-fitness">Try get_design — Pulse Fitness</a>
-    <p class="try">Also try: <a href="/api/mcp?tool=get_design&amp;slug=drift">drift</a>, <a href="/api/mcp?tool=get_design&amp;slug=field-notes">field-notes</a>, <a href="/api/mcp?tool=get_design&amp;slug=northbound">northbound</a></p>
+    <p class="try">Also try: <a href="/api/mcp?tool=get_design&amp;slug=drift">drift</a>, <a href="/api/mcp?tool=get_design&amp;slug=field-notes">field-notes</a>, <a href="/api/mcp?tool=get_design&amp;slug=northbound">northbound</a>, <a href="/api/mcp?tool=get_design&amp;slug=vault-bank">vault-bank</a></p>
   </div>
 
   <div class="card">
@@ -60,6 +56,7 @@ GET /api/mcp?tool=search_designs&amp;q=pulse</pre>
     <code>get_stats</code> — how many live pages there are, counted from the real files.</p>
     <p class="try">Canonical site: https://biton.is-a.dev — temporary mirror: https://biton-eta.vercel.app</p>
   </div>
+  <footer>BITON is free and open. No paywall, no sign-up.</footer>
 </div>
 <script>
 document.getElementById("copy").addEventListener("click", function(){
