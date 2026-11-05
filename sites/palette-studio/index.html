@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Palette Studio — Build a color palette, copy the hex</title>
+<meta name="description" content="Palette Studio builds color palettes from one color: tints, shades, and a matching accent. Copy any hex, save palettes in your browser. No sign-up." />
+<link rel="stylesheet" href="/sites/palette-studio/styles.css" />
+</head>
+<body>
+<main class="wrap">
+  <header>
+    <div class="logo">Palette Studio<span>.</span></div>
+    <p class="tag">One color in. A whole palette out.</p>
+  </header>
+
+  <section class="panel">
+    <div class="controls">
+      <label class="picker">Base color
+        <input type="color" id="baseColor" value="#FF5938" />
+        <span id="baseHex">#FF5938</span>
+      </label>
+      <label class="field">Or type a hex
+        <input id="hexInput" maxlength="7" value="#FF5938" spellcheck="false" />
+      </label>
+      <button type="button" class="btn primary" id="randomBtn">🎲 Random</button>
+    </div>
+    <div class="palette" id="palette"></div>
+    <p class="hint">Tap any swatch to copy its hex. Dark and light text on each swatch is picked for contrast.</p>
+    <div class="actions">
+      <button type="button" class="btn dark" id="saveBtn">Save this palette</button>
+      <button type="button" class="btn ghost" id="cssBtn">Copy as CSS</button>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>Your saved palettes</h2>
+    <div id="savedList" class="saved"></div>
+    <p class="empty" id="savedEmpty">Nothing saved yet — build a palette you like and hit Save. Saved palettes live in this browser only.</p>
+  </section>
+
+  <section class="panel">
+    <h2>How a palette is built</h2>
+    <ol class="steps">
+      <li><b>Tints</b> — your base color mixed toward white, in steps.</li>
+      <li><b>Shades</b> — your base color mixed toward black, in steps.</li>
+      <li><b>Accent</b> — the color opposite yours on the wheel, for the one thing that should stand out.</li>
+    </ol>
+  </section>
+  <footer><a href="/">← Back to BITON</a> · Palette Studio is part of BITON — free, no sign-up, nothing leaves your browser.</footer>
+</main>
+<script src="/sites/palette-studio/app.js"></script>
+</body>
+</html>
